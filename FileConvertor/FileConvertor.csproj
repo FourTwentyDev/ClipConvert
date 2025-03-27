@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+
+  <!-- Removed FrameworkReference as it's implicitly included by the SDK -->
+
+  <ItemGroup>
+    <PackageReference Include="MaterialDesignThemes" Version="4.9.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
+    <!-- Document conversion packages -->
+    <PackageReference Include="itext7" Version="8.0.2" />
+    <PackageReference Include="itext7.bouncy-castle-adapter" Version="8.0.2" />
+    <PackageReference Include="itext7.pdfhtml" Version="5.0.2" />
+    <PackageReference Include="Markdig" Version="0.33.0" />
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.0.0" />
+    <PackageReference Include="NPOI" Version="2.6.2" />
+    <PackageReference Include="ClosedXML" Version="0.102.1" />
+    <!-- Image processing packages -->
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.0.2" />
+    <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="13.4.0" />
+    <!-- Audio/Video conversion packages -->
+    <PackageReference Include="NAudio" Version="2.2.1" />
+    <PackageReference Include="Xabe.FFmpeg" Version="5.2.6" />
+    <!-- Compression packages -->
+    <PackageReference Include="SharpZipLib" Version="1.4.2" />
+    <!-- PDF processing packages -->
+    <PackageReference Include="PdfSharp" Version="6.0.0" />
+    <PackageReference Include="PdfPig" Version="0.1.8" />
+    <!-- Memory optimization packages -->
+    <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="2.3.2" />
+  </ItemGroup>
+
+
+</Project>

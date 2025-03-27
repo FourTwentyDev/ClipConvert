@@ -1,0 +1,324 @@
+<Window x:Class="FileConvertor.UI.Views.ConversionDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:local="clr-namespace:FileConvertor.UI.Views"
+        mc:Ignorable="d"
+        Title="File Converter" 
+        Height="500" 
+        Width="480"
+        WindowStartupLocation="CenterScreen"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="Transparent"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        ResizeMode="NoResize">
+    
+    <Window.Effect>
+        <DropShadowEffect BlurRadius="15" Direction="-90" RenderingBias="Quality" ShadowDepth="2" Color="#22000000"/>
+    </Window.Effect>
+    
+    <Border CornerRadius="10" Background="{DynamicResource MaterialDesignPaper}">
+        <Grid Margin="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header with gradient -->
+            <Border Grid.Row="0" CornerRadius="10,10,0,0">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#673AB7" Offset="0.0"/>
+                        <GradientStop Color="#512DA8" Offset="1.0"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <materialDesign:PackIcon Kind="FileReplace" Width="24" Height="24" 
+                                           Margin="16,12,8,12" VerticalAlignment="Center"
+                                           Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"/>
+                    
+                    <TextBlock Grid.Column="1" Text="File Converter" Margin="0,12,0,12" 
+                               Style="{StaticResource MaterialDesignHeadline6TextBlock}" 
+                               Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"/>
+                    
+                    <Button Grid.Column="2" Command="{Binding CloseCommand}" 
+                            Style="{StaticResource MaterialDesignIconButton}" 
+                            Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
+                            Margin="0,0,12,0">
+                        <materialDesign:PackIcon Kind="Close" />
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- Content -->
+            <Grid Grid.Row="1" Margin="16,16,16,8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- File Info - Enhanced with better spacing and visual hierarchy -->
+                <materialDesign:Card Grid.Row="0" Margin="0,0,0,16" UniformCornerRadius="6" 
+                                   Padding="12" Background="{DynamicResource MaterialDesignCardBackground}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <!-- File name with dynamic icon based on file type -->
+                        <Grid Grid.Row="0" Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <materialDesign:PackIcon Kind="{Binding FileIconKind}" Width="24" Height="24" 
+                                                   VerticalAlignment="Center" Margin="0,0,12,0"/>
+                            
+                            <TextBlock Grid.Column="1" Text="{Binding SelectedFile.FileName}" 
+                                       Style="{StaticResource MaterialDesignBody1TextBlock}" 
+                                       FontWeight="Medium" 
+                                       TextTrimming="CharacterEllipsis"/>
+                        </Grid>
+                        
+                        <!-- Technical details with better layout -->
+                        <Grid Grid.Row="1" Margin="36,0,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
+                            <!-- Format with better contrast -->
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Format:" 
+                                       FontSize="12" Foreground="{DynamicResource MaterialDesignBodyLight}" 
+                                       Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <Border Grid.Row="0" Grid.Column="1" Background="{DynamicResource PrimaryHueLightBrush}" 
+                                    CornerRadius="4" Padding="6,2" HorizontalAlignment="Left">
+                                <TextBlock Text="{Binding SelectedFile.FileExtension}" 
+                                           FontSize="12" FontWeight="Medium" 
+                                           Foreground="{DynamicResource PrimaryHueLightForegroundBrush}"/>
+                            </Border>
+                            
+                            <!-- Size with better contrast -->
+                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Size:" 
+                                       FontSize="12" Foreground="{DynamicResource MaterialDesignBodyLight}" 
+                                       Margin="16,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding FormattedFileSize}" 
+                                       FontSize="12" FontWeight="Medium" VerticalAlignment="Center"/>
+                            
+                            <!-- Path with tooltip for full path -->
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Path:" 
+                                       FontSize="12" Foreground="{DynamicResource MaterialDesignBodyLight}" 
+                                       Margin="0,8,8,0" VerticalAlignment="Top"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" 
+                                       Text="{Binding SelectedFile.FilePath}" 
+                                       ToolTip="{Binding SelectedFile.FilePath}"
+                                       FontSize="12" TextTrimming="CharacterEllipsis"
+                                       Margin="0,8,0,0" VerticalAlignment="Top"/>
+                        </Grid>
+                    </Grid>
+                </materialDesign:Card>
+
+                <!-- Target Format - Enhanced with visual cues -->
+                <materialDesign:Card Grid.Row="1" Margin="0,0,0,16" UniformCornerRadius="6" 
+                                   Padding="12" Background="{DynamicResource MaterialDesignCardBackground}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="ArrowRightBold" Width="20" Height="20" 
+                                                   VerticalAlignment="Center" Margin="0,0,12,0"/>
+                            <TextBlock Text="Convert to:" VerticalAlignment="Center" 
+                                       FontWeight="Medium" Margin="0,0,12,0"/>
+                        </StackPanel>
+                        
+                        <ComboBox Grid.Column="1" 
+                                  ItemsSource="{Binding AvailableTargetFormats}" 
+                                  SelectedItem="{Binding SelectedTargetFormat}"
+                                  Style="{StaticResource MaterialDesignFilledComboBox}"
+                                  materialDesign:HintAssist.Hint="Select target format"
+                                  materialDesign:TextFieldAssist.HasClearButton="True"
+                                  materialDesign:TextFieldAssist.UnderlineBrush="{DynamicResource PrimaryHueMidBrush}"/>
+                    </Grid>
+                </materialDesign:Card>
+
+                <!-- Convert Button - Enhanced modern design -->
+                <Button Grid.Row="2" 
+                        Command="{Binding ConvertCommand}"
+                        Style="{StaticResource MaterialDesignRaisedButton}"
+                        materialDesign:ButtonAssist.CornerRadius="28"
+                        materialDesign:ShadowAssist.ShadowDepth="Depth3"
+                        materialDesign:ButtonProgressAssist.Value="-1"
+                        materialDesign:ButtonProgressAssist.IsIndicatorVisible="{Binding IsConverting}"
+                        materialDesign:ButtonProgressAssist.IsIndeterminate="True"
+                        Background="{DynamicResource PrimaryHueDarkBrush}"
+                        BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
+                        Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}"
+                        HorizontalAlignment="Center"
+                        Margin="0,0,0,16"
+                        Width="180"
+                        Height="56"
+                        IsDefault="True">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <materialDesign:PackIcon Kind="FileReplace" 
+                                               Width="24" 
+                                               Height="24" 
+                                               VerticalAlignment="Center" 
+                                               Margin="0,0,12,0"/>
+                        
+                        <TextBlock Grid.Column="1" 
+                                   Text="CONVERT" 
+                                   FontSize="16" 
+                                   FontWeight="Medium"
+                                   VerticalAlignment="Center"/>
+                    </Grid>
+                </Button>
+
+                <!-- Status - Improved visual feedback with more space -->
+                <Grid Grid.Row="3" VerticalAlignment="Top" MinHeight="80">
+                    <!-- Status messages in order of priority -->
+                    <Grid>
+                        <!-- Default message when no status is active -->
+                        <materialDesign:Card x:Name="IdleCard" 
+                                           Visibility="{Binding IsIdle, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                           Background="{DynamicResource MaterialDesignCardBackground}"
+                                           UniformCornerRadius="6"
+                                           Padding="12"
+                                           materialDesign:ElevationAssist.Elevation="Dp1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <materialDesign:PackIcon Kind="Information" Width="24" Height="24" 
+                                                       Foreground="{DynamicResource MaterialDesignBodyLight}" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                
+                                <TextBlock Grid.Column="1" Text="{Binding StatusMessage}" 
+                                           VerticalAlignment="Center" TextWrapping="Wrap" 
+                                           Foreground="{DynamicResource MaterialDesignBodyLight}" FontWeight="Medium"/>
+                            </Grid>
+                        </materialDesign:Card>
+                        
+                        <!-- Converting message with animation -->
+                        <materialDesign:Card x:Name="ConvertingCard"
+                                           Visibility="{Binding IsConverting, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                           Background="#E3F2FD"
+                                           UniformCornerRadius="6"
+                                           Padding="12"
+                                           materialDesign:ElevationAssist.Elevation="Dp2"
+                                           Panel.ZIndex="1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <materialDesign:PackIcon Kind="ClockOutline" Width="24" Height="24" 
+                                                       Foreground="#1565C0" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                
+                                <TextBlock Grid.Column="1" Text="{Binding StatusMessage}" 
+                                           VerticalAlignment="Center" TextWrapping="Wrap" 
+                                           Foreground="#1565C0" FontWeight="Medium"/>
+                                
+                                <ProgressBar Grid.Column="2" IsIndeterminate="True" 
+                                             Style="{StaticResource MaterialDesignCircularProgressBar}" 
+                                             Value="0" Width="24" Height="24" Margin="12,0,0,0"/>
+                            </Grid>
+                        </materialDesign:Card>
+                        
+                        <!-- Error message -->
+                        <materialDesign:Card x:Name="ErrorCard"
+                                           Visibility="{Binding IsError, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                           Background="#FFEBEE"
+                                           UniformCornerRadius="6"
+                                           Padding="12"
+                                           materialDesign:ElevationAssist.Elevation="Dp2"
+                                           Panel.ZIndex="2">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <materialDesign:PackIcon Kind="AlertCircle" Width="24" Height="24" 
+                                                       Foreground="#D32F2F" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                
+                                <TextBlock Grid.Column="1" Text="{Binding StatusMessage}" 
+                                           VerticalAlignment="Center" TextWrapping="Wrap" 
+                                           Foreground="#D32F2F" FontWeight="Medium"/>
+                            </Grid>
+                        </materialDesign:Card>
+                        
+                        <!-- Success message - highest priority -->
+                        <materialDesign:Card x:Name="SuccessCard"
+                                           Visibility="{Binding IsSuccess, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                           Background="#E8F5E9"
+                                           UniformCornerRadius="6"
+                                           Padding="12"
+                                           materialDesign:ElevationAssist.Elevation="Dp3"
+                                           Panel.ZIndex="3">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <materialDesign:PackIcon Kind="CheckCircle" Width="24" Height="24" 
+                                                       Foreground="#2E7D32" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                
+                                <TextBlock Grid.Column="1" Text="{Binding StatusMessage}" 
+                                           VerticalAlignment="Center" TextWrapping="Wrap" 
+                                           Foreground="#2E7D32" FontWeight="Medium"/>
+                            </Grid>
+                        </materialDesign:Card>
+                    </Grid>
+                </Grid>
+            </Grid>
+
+            <!-- Footer with subtle separator -->
+            <StackPanel Grid.Row="2" Margin="0,0,0,8">
+                <Separator Margin="16,0" Opacity="0.2"/>
+                <TextBlock Text="Press Ctrl+Alt+C to open this dialog" 
+                           HorizontalAlignment="Center" 
+                           VerticalAlignment="Bottom"
+                           Margin="0,8,0,0"
+                           Foreground="{DynamicResource MaterialDesignBodyLight}"
+                           FontSize="11"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>
