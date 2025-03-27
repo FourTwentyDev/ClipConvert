@@ -462,21 +462,24 @@
                       KeyPath="yes" />
             </Component>
             
-            <!-- XLParser -->
-            <Component Id="XLParserDLL" Guid="*">
-                <File Id="XLParserDLLFile" 
-                      Name="XLParser.dll" 
-                      Source="$(var.BinDir)\XLParser.dll" 
+            <!-- ClosedXML.Parser -->
+            <Component Id="ClosedXMLParserDLL" Guid="*">
+                <File Id="ClosedXMLParserDLLFile" 
+                      Name="ClosedXML.Parser.dll" 
+                      Source="$(var.BinDir)\ClosedXML.Parser.dll" 
                       KeyPath="yes" />
             </Component>
             
-            <!-- Irony -->
-            <Component Id="IronyDLL" Guid="*">
-                <File Id="IronyDLLFile" 
-                      Name="Irony.dll" 
-                      Source="$(var.BinDir)\Irony.dll" 
+            <!-- RBush -->
+            <Component Id="RBushDLL" Guid="*">
+                <File Id="RBushDLLFile" 
+                      Name="RBush.dll" 
+                      Source="$(var.BinDir)\RBush.dll" 
                       KeyPath="yes" />
             </Component>
+            
+            <!-- XLParser -->
+            
             
             <!-- SixLabors Fonts -->
             <Component Id="SixLaborsFontsDLL" Guid="*">
@@ -798,8 +801,8 @@
             <ComponentRef Id="NPOIOpenXmlFormatsDLL" />
             <ComponentRef Id="ClosedXMLDLL" />
             <ComponentRef Id="ExcelNumberFormatDLL" />
-            <ComponentRef Id="XLParserDLL" />
-            <ComponentRef Id="IronyDLL" />
+            <ComponentRef Id="ClosedXMLParserDLL" />
+            <ComponentRef Id="RBushDLL" />
             
             <!-- Image Processing -->
             <ComponentRef Id="SixLaborsImageSharpDLL" />

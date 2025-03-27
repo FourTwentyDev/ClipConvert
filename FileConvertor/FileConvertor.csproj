@@ -33,9 +33,9 @@
     <PackageReference Include="itext7.bouncy-castle-adapter" Version="9.1.0" />
     <PackageReference Include="itext7.pdfhtml" Version="6.1.0" />
     <PackageReference Include="Markdig" Version="0.33.0" />
-    <PackageReference Include="DocumentFormat.OpenXml" Version="2.20.0" />
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.0.1" />
     <PackageReference Include="NPOI" Version="2.6.2" />
-    <PackageReference Include="ClosedXML" Version="0.102.1" />
+    <PackageReference Include="ClosedXML" Version="0.104.0" />
     <!-- Image processing packages -->
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.7" />
     <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="13.4.0" />
