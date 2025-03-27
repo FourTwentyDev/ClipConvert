@@ -8,6 +8,17 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
+    <!-- Disable auto-generation of assembly attributes that we've defined in AssemblyInfo.cs -->
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Product>ClipConvert</Product>
+    <Version>1.0.0</Version>
+    <Authors>FourTwentyDev</Authors>
+    <Company>FourTwentyDev</Company>
+    <Description>On-the-fly file converter that works directly with your clipboard</Description>
+    <Copyright>Copyright © 2025 FourTwentyDev</Copyright>
+    <PackageProjectUrl>https://github.com/FourTwentyDev/ClipConvert</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/FourTwentyDev/ClipConvert</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <!-- Removed FrameworkReference as it's implicitly included by the SDK -->

@@ -4,6 +4,8 @@ VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileConvertor", "FileConvertor\FileConvertor.csproj", "{4F1EACB4-843F-5960-F3BF-B616BBAF65E0}"
 EndProject
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "ClipConvert", "FileConvertor\Installer\ClipConvert.wixproj", "{8FE4A3FD-9C5B-4B8A-8C3E-5EC9B8C6DBF0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -14,6 +16,10 @@ Global
 		{4F1EACB4-843F-5960-F3BF-B616BBAF65E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F1EACB4-843F-5960-F3BF-B616BBAF65E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F1EACB4-843F-5960-F3BF-B616BBAF65E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FE4A3FD-9C5B-4B8A-8C3E-5EC9B8C6DBF0}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{8FE4A3FD-9C5B-4B8A-8C3E-5EC9B8C6DBF0}.Debug|Any CPU.Build.0 = Debug|x86
+		{8FE4A3FD-9C5B-4B8A-8C3E-5EC9B8C6DBF0}.Release|Any CPU.ActiveCfg = Release|x86
+		{8FE4A3FD-9C5B-4B8A-8C3E-5EC9B8C6DBF0}.Release|Any CPU.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

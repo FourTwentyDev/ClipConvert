@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>3.10</ProductVersion>
+    <ProjectGuid>8fe4a3fd-9c5b-4b8a-8c3e-5ec9b8c6dbf0</ProjectGuid>
+    <SchemaVersion>2.0</SchemaVersion>
+    <OutputName>ClipConvert</OutputName>
+    <OutputType>Package</OutputType>
+    <WixToolPath>C:\Program Files (x86)\WiX Toolset v3.14\bin\</WixToolPath>
+    <WixToolsPath>C:\Program Files (x86)\WiX Toolset v3.14\bin\</WixToolsPath>
+    <WixTargetsPath>C:\Program Files (x86)\MSBuild\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+    <WixExtDir>C:\Program Files (x86)\WiX Toolset v3.14\bin\</WixExtDir>
+    <WixTasksPath>C:\Program Files (x86)\WiX Toolset v3.14\bin\WixTasks.dll</WixTasksPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>Debug;BinDir=..\..\FileConvertor\bin\Debug\net9.0-windows;IconsDir=..\Assets</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>BinDir=..\..\FileConvertor\bin\Release\net9.0-windows;IconsDir=..\Assets</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="ClipConvert.wxs" />
+  </ItemGroup>
+  <ItemGroup>
+    <WixExtension Include="WixUIExtension">
+      <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
+      <Name>WixUIExtension</Name>
+    </WixExtension>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="..\Assets" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Assets\app_icon.ico" />
+    <Content Include="..\Assets\banner.bmp" />
+    <Content Include="..\Assets\dialog.bmp" />
+    <Content Include="..\Assets\License.rtf" />
+  </ItemGroup>
+  <!-- Define the WiX tasks -->
+  <UsingTask TaskName="ResolveWixReferences" AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="Candle" AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="Light" AssemblyFile="$(WixTasksPath)" />
+  
+  <Import Project="$(WixTargetsPath)" />
+</Project>

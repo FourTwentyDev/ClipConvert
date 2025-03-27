@@ -312,12 +312,33 @@
             <!-- Footer with subtle separator -->
             <StackPanel Grid.Row="2" Margin="0,0,0,8">
                 <Separator Margin="16,0" Opacity="0.2"/>
-                <TextBlock Text="Press Ctrl+Alt+C to open this dialog" 
-                           HorizontalAlignment="Center" 
-                           VerticalAlignment="Bottom"
-                           Margin="0,8,0,0"
-                           Foreground="{DynamicResource MaterialDesignBodyLight}"
-                           FontSize="11"/>
+                <Grid Margin="16,8,16,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock Text="Press Ctrl+Alt+C to open this dialog" 
+                               HorizontalAlignment="Left" 
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource MaterialDesignBodyLight}"
+                               FontSize="11"/>
+                               
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                Height="24" Padding="4"
+                                ToolTip="View source code on GitHub"
+                                Click="GitHubButton_Click">
+                            <materialDesign:PackIcon Kind="Github" Width="16" Height="16" />
+                        </Button>
+                        <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                Height="24" Padding="4" Margin="4,0,0,0"
+                                ToolTip="Open source - MIT License"
+                                Click="LicenseButton_Click">
+                            <materialDesign:PackIcon Kind="License" Width="16" Height="16" />
+                        </Button>
+                    </StackPanel>
+                </Grid>
             </StackPanel>
         </Grid>
     </Border>

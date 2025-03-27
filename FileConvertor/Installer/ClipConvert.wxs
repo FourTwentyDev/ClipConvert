@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <!-- Define product information -->
+    <Product Id="*" 
+             Name="ClipConvert" 
+             Language="1033" 
+             Version="1.0.0.0" 
+             Manufacturer="FourTwentyDev" 
+             UpgradeCode="4a2a8a19-6c7d-4d1f-9b5e-3ed9e1f2c8b0">
+        
+        <!-- Define package information -->
+        <Package InstallerVersion="200" 
+                 Compressed="yes" 
+                 InstallScope="perMachine" 
+                 Description="ClipConvert - On-the-fly file converter"
+                 Comments="Converts files directly from your clipboard - no cloud, no uploads, completely local." />
+        
+        <!-- Use WiX standard UI -->
+        <UIRef Id="WixUI_InstallDir" />
+        <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+        <WixVariable Id="WixUILicenseRtf" Value="$(var.IconsDir)\License.rtf" />
+        <WixVariable Id="WixUIBannerBmp" Value="$(var.IconsDir)\banner.bmp" />
+        <WixVariable Id="WixUIDialogBmp" Value="$(var.IconsDir)\dialog.bmp" />
+        
+        <!-- Define upgrade behavior -->
+        <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+        
+        <!-- Define media -->
+        <MediaTemplate EmbedCab="yes" />
+        
+        <!-- Define installation directory structure -->
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFilesFolder">
+                <Directory Id="INSTALLFOLDER" Name="ClipConvert">
+                    <!-- Application files will be defined here -->
+                </Directory>
+            </Directory>
+            
+            <!-- Start Menu shortcuts -->
+            <Directory Id="ProgramMenuFolder">
+                <Directory Id="ApplicationProgramsFolder" Name="ClipConvert" />
+            </Directory>
+            
+            <!-- Desktop shortcut -->
+            <Directory Id="DesktopFolder" Name="Desktop" />
+        </Directory>
+        
+        <!-- Define components and files -->
+        <DirectoryRef Id="INSTALLFOLDER">
+            <!-- Main executable and dependencies -->
+            <Component Id="MainExecutable" Guid="*">
+                <File Id="FileConvertorEXE" 
+                      Name="FileConvertor.exe" 
+                      Source="$(var.BinDir)\FileConvertor.exe" 
+                      KeyPath="yes">
+                    <!-- Create shortcuts -->
+                    <Shortcut Id="StartMenuShortcut" 
+                              Directory="ApplicationProgramsFolder" 
+                              Name="ClipConvert" 
+                              WorkingDirectory="INSTALLFOLDER" 
+                              Icon="ClipConvertIcon.ico" 
+                              IconIndex="0" 
+                              Advertise="yes" />
+                    <Shortcut Id="DesktopShortcut" 
+                              Directory="DesktopFolder" 
+                              Name="ClipConvert" 
+                              WorkingDirectory="INSTALLFOLDER" 
+                              Icon="ClipConvertIcon.ico" 
+                              IconIndex="0" 
+                              Advertise="yes" />
+                </File>
+            </Component>
+            
+            <!-- Add all DLL files -->
+            <Component Id="DependencyDlls" Guid="*">
+                <File Id="FileConvertorDLL" 
+                      Name="FileConvertor.dll" 
+                      Source="$(var.BinDir)\FileConvertor.dll" 
+                      KeyPath="yes" />
+                <!-- Additional DLLs would be listed here -->
+            </Component>
+            
+            <!-- Configuration files -->
+            <Component Id="RuntimeConfigFile" Guid="*">
+                <File Id="ConfigJson" 
+                      Name="FileConvertor.runtimeconfig.json" 
+                      Source="$(var.BinDir)\FileConvertor.runtimeconfig.json" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="DepsFile" Guid="*">
+                <File Id="DepsJson" 
+                      Name="FileConvertor.deps.json" 
+                      Source="$(var.BinDir)\FileConvertor.deps.json" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- Auto-start with Windows -->
+            <Component Id="RegistryEntries" Guid="*">
+                <RegistryValue Root="HKCU" 
+                               Key="Software\Microsoft\Windows\CurrentVersion\Run" 
+                               Name="ClipConvert" 
+                               Value="[INSTALLFOLDER]FileConvertor.exe" 
+                               Type="string" 
+                               KeyPath="yes" />
+            </Component>
+        </DirectoryRef>
+        
+        <!-- Define Start Menu shortcut folder -->
+        <DirectoryRef Id="ApplicationProgramsFolder">
+            <Component Id="StartMenuShortcuts" Guid="*">
+                <RemoveFolder Id="CleanUpShortCut" Directory="ApplicationProgramsFolder" On="uninstall" />
+                <RegistryValue Root="HKCU" Key="Software\FourTwentyDev\ClipConvert" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+            </Component>
+        </DirectoryRef>
+        
+        <!-- Define features -->
+        <Feature Id="ProductFeature" Title="ClipConvert" Level="1">
+            <ComponentRef Id="MainExecutable" />
+            <ComponentRef Id="DependencyDlls" />
+            <ComponentRef Id="RuntimeConfigFile" />
+            <ComponentRef Id="DepsFile" />
+            <ComponentRef Id="StartMenuShortcuts" />
+            <ComponentRef Id="RegistryEntries" />
+            <!-- Additional component references would be added here -->
+        </Feature>
+        
+        <!-- Define icons -->
+        <Icon Id="ClipConvertIcon.ico" SourceFile="$(var.IconsDir)\app_icon.ico" />
+        <Property Id="ARPPRODUCTICON" Value="ClipConvertIcon.ico" />
+        
+        <!-- Custom actions -->
+        <CustomAction Id="LaunchApplication" 
+                      FileKey="FileConvertorEXE" 
+                      ExeCommand="" 
+                      Return="asyncNoWait" />
+        
+        <!-- Installation sequence -->
+        <InstallExecuteSequence>
+            <Custom Action="LaunchApplication" After="InstallFinalize">NOT Installed</Custom>
+        </InstallExecuteSequence>
+        
+        <!-- UI sequence -->
+        <InstallUISequence>
+            <Show Dialog="WelcomeDlg" Before="ProgressDlg" />
+        </InstallUISequence>
+    </Product>
+</Wix>

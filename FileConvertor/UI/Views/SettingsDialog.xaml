@@ -133,8 +133,59 @@
                     </Grid>
                 </materialDesign:Card>
 
+                <!-- About Section -->
+                <materialDesign:Card Grid.Row="1" Margin="0,0,0,16" UniformCornerRadius="6" 
+                                   Padding="16" Background="{DynamicResource MaterialDesignCardBackground}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <!-- Section Title -->
+                        <TextBlock Grid.Row="0" Text="About ClipConvert" 
+                                   Style="{StaticResource MaterialDesignSubtitle1TextBlock}" 
+                                   Margin="0,0,0,16"/>
+                        
+                        <!-- Open Source Info -->
+                        <StackPanel Grid.Row="1" Margin="0,0,0,16">
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,0,8">
+                                <Run Text="ClipConvert is an open-source file converter that works directly with your clipboard."/>
+                                <Run Text="All conversions happen locally on your device - no cloud, no uploads, no privacy concerns."/>
+                            </TextBlock>
+                            
+                            <TextBlock TextWrapping="Wrap">
+                                <Run Text="This software is released under the"/>
+                                <Run Text="MIT License" FontWeight="SemiBold"/>
+                                <Run Text="and the source code is available on GitHub."/>
+                            </TextBlock>
+                        </StackPanel>
+                        
+                        <!-- Links -->
+                        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Style="{StaticResource MaterialDesignOutlinedButton}"
+                                    Margin="0,0,8,0"
+                                    Click="GitHubButton_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="Github" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Source Code"/>
+                                </StackPanel>
+                            </Button>
+                            
+                            <Button Style="{StaticResource MaterialDesignOutlinedButton}"
+                                    Click="LicenseButton_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="License" Margin="0,0,8,0"/>
+                                    <TextBlock Text="License"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </materialDesign:Card>
+                
                 <!-- Action Buttons -->
-                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,16">
+                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,16">
                     <Button Command="{Binding SaveCommand}" 
                             Style="{StaticResource MaterialDesignRaisedButton}" 
                             materialDesign:ButtonAssist.CornerRadius="4" 
