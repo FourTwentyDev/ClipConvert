@@ -27,6 +27,9 @@ namespace FileConvertor.UI.ViewModels
         private readonly ConversionContext _conversionContext;
         private readonly DispatcherTimer _clipboardMonitorTimer;
         private readonly DispatcherTimer _successMessageTimer;
+        
+        // Flag to prevent processing the converted file that was just placed in the clipboard
+        private bool _ignoreNextClipboardCheck = false;
 
         private Models.FileInfo? _selectedFile;
         private string? _selectedTargetFormat;
@@ -247,6 +250,13 @@ namespace FileConvertor.UI.ViewModels
         /// </summary>
         private void CheckClipboardForNewFile()
         {
+            // Skip this check if we're ignoring the next clipboard check
+            if (_ignoreNextClipboardCheck)
+            {
+                _ignoreNextClipboardCheck = false;
+                return;
+            }
+            
             if (!_clipboardService.ContainsFile())
                 return;
                 
@@ -383,7 +393,8 @@ namespace FileConvertor.UI.ViewModels
                 Logger.Log(LogLevel.Debug, "ConversionViewModel", $"Using converter: {_conversionContext.Converter.GetType().Name}");
 
                 // Create a memory stream to hold the converted data
-                using var outputStream = new MemoryStream();
+                // Don't use 'using' here as we need the stream to remain open for clipboard operations
+                var outputStream = new MemoryStream();
                 Logger.Log(LogLevel.Debug, "ConversionViewModel", "Created output memory stream");
 
                 // Convert the file
@@ -437,8 +448,20 @@ namespace FileConvertor.UI.ViewModels
 
                 // Copy to clipboard
                 Logger.Log(LogLevel.Debug, "ConversionViewModel", "Copying to clipboard");
-                await _clipboardService.SetFileDataAsync(outputStream, newFileName, SelectedTargetFormat);
-                Logger.Log(LogLevel.Debug, "ConversionViewModel", "Copied to clipboard successfully");
+                try
+                {
+                    // Set flag to ignore the next clipboard check since we're putting our own file there
+                    _ignoreNextClipboardCheck = true;
+                    
+                    await _clipboardService.SetFileDataAsync(outputStream, newFileName, SelectedTargetFormat);
+                    Logger.Log(LogLevel.Debug, "ConversionViewModel", "Copied to clipboard successfully");
+                }
+                finally
+                {
+                    // Ensure the stream is disposed after clipboard operation
+                    outputStream.Dispose();
+                    Logger.Log(LogLevel.Debug, "ConversionViewModel", "Output stream disposed");
+                }
 
                 // Ensure success state is set correctly
                 StatusMessage = $"Successfully converted to {SelectedTargetFormat.ToUpper()} (available in clipboard)";

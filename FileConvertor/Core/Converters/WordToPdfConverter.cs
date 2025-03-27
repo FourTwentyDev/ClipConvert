@@ -12,6 +12,7 @@ using iText.Layout.Element;
 using iText.Layout.Properties;
 using iText.IO.Font.Constants;
 using iText.Kernel.Font;
+using Microsoft.IO;
 
 namespace FileConvertor.Core.Converters
 {
@@ -20,6 +21,8 @@ namespace FileConvertor.Core.Converters
     /// </summary>
     public class WordToPdfConverter : BaseConverter
     {
+        private static readonly RecyclableMemoryStreamManager _memoryStreamManager = new RecyclableMemoryStreamManager();
+
         /// <summary>
         /// Gets the source format this converter can handle
         /// </summary>
@@ -44,87 +47,108 @@ namespace FileConvertor.Core.Converters
             if (targetStream == null)
                 throw new ArgumentNullException(nameof(targetStream));
 
-            // Create a temporary copy of the stream that we can seek
-            using var memoryStream = new MemoryStream();
-            await sourceStream.CopyToAsync(memoryStream);
-            memoryStream.Position = 0;
+            // Create a complete copy of the source stream to ensure we have all the data
+            using var sourceMemoryStream = _memoryStreamManager.GetStream("WordToPdfConverter.SourceCopy");
+            await sourceStream.CopyToAsync(sourceMemoryStream);
+            sourceMemoryStream.Position = 0;
 
             // Extract text and structure from the Word document
-            var documentContent = ExtractWordContent(memoryStream);
+            var documentContent = ExtractWordContent(sourceMemoryStream);
 
-            // Create a PDF writer
-            var writer = new PdfWriter(targetStream);
+            // Create a temporary file for the PDF output
+            string tempPdfPath = Path.Combine(Path.GetTempPath(), $"WordToPdf_{Guid.NewGuid()}.pdf");
             
-            // Create a PDF document
-            var pdf = new PdfDocument(writer);
-            
-            // Create a document
-            var document = new iText.Layout.Document(pdf);
-
             try
             {
-                // Set default font
-                var font = PdfFontFactory.CreateFont(StandardFonts.HELVETICA);
-                var boldFont = PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD);
-                var italicFont = PdfFontFactory.CreateFont(StandardFonts.HELVETICA_OBLIQUE);
-                
-                // Process each paragraph
-                foreach (var para in documentContent.Paragraphs)
+                // Create a PDF writer that writes to a file
+                using (var fileStream = new FileStream(tempPdfPath, FileMode.Create, FileAccess.Write))
                 {
-                    var paragraph = new iText.Layout.Element.Paragraph();
+                    var writer = new PdfWriter(fileStream);
+                    var pdf = new PdfDocument(writer);
+                    var document = new iText.Layout.Document(pdf);
                     
-                    // Apply paragraph style
-                    if (para.IsHeading)
+                    // Set default font
+                    var font = PdfFontFactory.CreateFont(StandardFonts.HELVETICA);
+                    var boldFont = PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD);
+                    var italicFont = PdfFontFactory.CreateFont(StandardFonts.HELVETICA_OBLIQUE);
+                    
+                    // Process each paragraph
+                    foreach (var para in documentContent.Paragraphs)
                     {
-                        float fontSize = para.HeadingLevel switch
+                        var paragraph = new iText.Layout.Element.Paragraph();
+                        
+                        // Apply paragraph style
+                        if (para.IsHeading)
                         {
-                            1 => 24,
-                            2 => 20,
-                            3 => 18,
-                            4 => 16,
-                            5 => 14,
-                            6 => 12,
-                            _ => 12
-                        };
-                        
-                        paragraph.SetFont(boldFont)
-                                .SetFontSize(fontSize)
-                                .SetMarginBottom(12);
-                    }
-                    else
-                    {
-                        paragraph.SetFont(font)
-                                .SetFontSize(11)
-                                .SetMarginBottom(8);
-                    }
-                    
-                    // Add text with formatting
-                    foreach (var run in para.Runs)
-                    {
-                        var text = new iText.Layout.Element.Text(run.Text);
-                        
-                        if (run.IsBold)
-                            text.SetFont(boldFont);
-                        else if (run.IsItalic)
-                            text.SetFont(italicFont);
-                        else
-                            text.SetFont(font);
+                            float fontSize = para.HeadingLevel switch
+                            {
+                                1 => 24,
+                                2 => 20,
+                                3 => 18,
+                                4 => 16,
+                                5 => 14,
+                                6 => 12,
+                                _ => 12
+                            };
                             
-                        paragraph.Add(text);
+                            paragraph.SetFont(boldFont)
+                                    .SetFontSize(fontSize)
+                                    .SetMarginBottom(12);
+                        }
+                        else
+                        {
+                            paragraph.SetFont(font)
+                                    .SetFontSize(11)
+                                    .SetMarginBottom(8);
+                        }
+                        
+                        // Add text with formatting
+                        foreach (var run in para.Runs)
+                        {
+                            var text = new iText.Layout.Element.Text(run.Text);
+                            
+                            if (run.IsBold)
+                                text.SetFont(boldFont);
+                            else if (run.IsItalic)
+                                text.SetFont(italicFont);
+                            else
+                                text.SetFont(font);
+                                
+                            paragraph.Add(text);
+                        }
+                        
+                        document.Add(paragraph);
                     }
                     
-                    document.Add(paragraph);
+                    // Add metadata
+                    pdf.GetDocumentInfo().SetTitle("Converted Word Document");
+                    pdf.GetDocumentInfo().SetCreator("File Converter Application");
+                    pdf.GetDocumentInfo().SetSubject("Word to PDF Conversion");
+                    
+                    // Close the document to apply all changes
+                    document.Close();
                 }
                 
-                // Add metadata
-                pdf.GetDocumentInfo().SetTitle("Converted Word Document");
-                pdf.GetDocumentInfo().SetCreator("File Converter Application");
-                pdf.GetDocumentInfo().SetSubject("Word to PDF Conversion");
+                // Now read the PDF file and copy it to the target stream
+                using (var fileStream = new FileStream(tempPdfPath, FileMode.Open, FileAccess.Read))
+                {
+                    fileStream.CopyTo(targetStream);
+                }
             }
             finally
             {
-                // Close the document to apply all changes
-                document.Close();
+                // Clean up the temporary file
+                if (File.Exists(tempPdfPath))
+                {
+                    try
+                    {
+                        File.Delete(tempPdfPath);
+                    }
+                    catch
+                    {
+                        // Ignore errors during cleanup
+                    }
+                }
             }
         }
         
@@ -137,7 +161,13 @@ namespace FileConvertor.Core.Converters
         {
             var content = new DocContent();
             
-            using (WordprocessingDocument wordDocument = WordprocessingDocument.Open(stream, false))
+            // Create a complete copy of the stream to avoid it being closed by WordprocessingDocument
+            using var memoryStream = _memoryStreamManager.GetStream("WordToPdfConverter.ExtractContent");
+            stream.CopyTo(memoryStream);
+            memoryStream.Position = 0;
+            
+            // Use leaveOpen: false since we're working with our own copy of the stream
+            using (WordprocessingDocument wordDocument = WordprocessingDocument.Open(memoryStream, false))
             {
                 var mainPart = wordDocument.MainDocumentPart;
                 if (mainPart != null && mainPart.Document != null)

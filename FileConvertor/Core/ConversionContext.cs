@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using FileConvertor.Core.Interfaces;
 using FileConvertor.Core.Logging;
+using Microsoft.IO;
 
 namespace FileConvertor.Core
 {
@@ -11,6 +12,7 @@ namespace FileConvertor.Core
     /// </summary>
     public class ConversionContext
     {
+        private static readonly RecyclableMemoryStreamManager _memoryStreamManager = new RecyclableMemoryStreamManager();
         private IConverter? _converter;
         private readonly ConverterFactory? _converterFactory;
 
@@ -80,14 +82,26 @@ namespace FileConvertor.Core
 
             try
             {
+                // Create a recyclable memory stream copy of the source
+                using var sourceMemoryStream = _memoryStreamManager.GetStream("ConversionContext.SourceCopy");
+                await sourceStream.CopyToAsync(sourceMemoryStream);
+                sourceMemoryStream.Position = 0;
+                
                 Logger.Log(LogLevel.Debug, "ConversionContext", $"Starting conversion with {Converter.GetType().Name}");
-                Logger.Log(LogLevel.Debug, "ConversionContext", $"Source stream: CanRead={sourceStream.CanRead}, CanSeek={sourceStream.CanSeek}, Position={sourceStream.Position}, Length={sourceStream.Length}");
+                Logger.Log(LogLevel.Debug, "ConversionContext", $"Source stream: CanRead={sourceMemoryStream.CanRead}, CanSeek={sourceMemoryStream.CanSeek}, Position={sourceMemoryStream.Position}, Length={sourceMemoryStream.Length}");
                 Logger.Log(LogLevel.Debug, "ConversionContext", $"Target stream: CanWrite={targetStream.CanWrite}, CanSeek={targetStream.CanSeek}");
                 
                 // Use the Converter property which will throw a descriptive exception if not set
-                await Converter.ConvertAsync(sourceStream, targetStream);
+                await Converter.ConvertAsync(sourceMemoryStream, targetStream);
                 
-                Logger.Log(LogLevel.Debug, "ConversionContext", $"Conversion completed successfully. Target stream length: {targetStream.Length}");
+                // Get the target length before any potential disposal
+                long targetLength = 0;
+                if (targetStream.CanSeek)
+                {
+                    targetLength = targetStream.Length;
+                }
+                
+                Logger.Log(LogLevel.Debug, "ConversionContext", $"Conversion completed successfully. Target stream length: {targetLength}");
             }
             catch (Exception ex)
             {
