@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows;
@@ -107,7 +107,7 @@ namespace FileConvertor
         {
             _notifyIcon = new NotifyIcon
             {
-                Icon = System.Drawing.SystemIcons.Application, // Use a default icon
+                Icon = new Icon(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "app_icon.ico")), // Use custom app icon
                 Visible = true,
                 Text = "File Converter"
             };

@@ -33,6 +33,22 @@
             <Directory Id="ProgramFilesFolder">
                 <Directory Id="INSTALLFOLDER" Name="ClipConvert">
                     <!-- Application files will be defined here -->
+                    
+                    <!-- Localization subdirectories -->
+                    <Directory Id="DEDIR" Name="de" />
+                    
+                    <!-- Native runtime subdirectories -->
+                    <Directory Id="RUNTIMESDIR" Name="runtimes">
+                        <Directory Id="WINARM64DIR" Name="win-arm64">
+                            <Directory Id="WINARM64NATIVEDIR" Name="native" />
+                        </Directory>
+                        <Directory Id="WINX64DIR" Name="win-x64">
+                            <Directory Id="WINX64NATIVEDIR" Name="native" />
+                        </Directory>
+                        <Directory Id="WINX86DIR" Name="win-x86">
+                            <Directory Id="WINX86NATIVEDIR" Name="native" />
+                        </Directory>
+                    </Directory>
                 </Directory>
             </Directory>
             
@@ -47,37 +63,643 @@
         
         <!-- Define components and files -->
         <DirectoryRef Id="INSTALLFOLDER">
-            <!-- Main executable and dependencies -->
+            <!-- Main executable -->
             <Component Id="MainExecutable" Guid="*">
                 <File Id="FileConvertorEXE" 
                       Name="FileConvertor.exe" 
                       Source="$(var.BinDir)\FileConvertor.exe" 
-                      KeyPath="yes">
-                    <!-- Create shortcuts -->
-                    <Shortcut Id="StartMenuShortcut" 
-                              Directory="ApplicationProgramsFolder" 
-                              Name="ClipConvert" 
-                              WorkingDirectory="INSTALLFOLDER" 
-                              Icon="ClipConvertIcon.ico" 
-                              IconIndex="0" 
-                              Advertise="yes" />
-                    <Shortcut Id="DesktopShortcut" 
-                              Directory="DesktopFolder" 
-                              Name="ClipConvert" 
-                              WorkingDirectory="INSTALLFOLDER" 
-                              Icon="ClipConvertIcon.ico" 
-                              IconIndex="0" 
-                              Advertise="yes" />
-                </File>
+                      KeyPath="yes" />
             </Component>
             
-            <!-- Add all DLL files -->
-            <Component Id="DependencyDlls" Guid="*">
+            <!-- Create shortcuts -->
+            <Component Id="ApplicationShortcuts" Guid="4a2a8a19-6c7d-4d1f-9b5e-3ed9e1f2c8b1">
+                <RegistryValue Root="HKCU" 
+                               Key="Software\FourTwentyDev\ClipConvert" 
+                               Name="installed" 
+                               Type="integer" 
+                               Value="1" 
+                               KeyPath="yes" />
+                               
+                <!-- Create Start Menu shortcut -->
+                <Shortcut Id="StartMenuShortcut" 
+                          Directory="ApplicationProgramsFolder" 
+                          Name="ClipConvert" 
+                          Target="[INSTALLFOLDER]FileConvertor.exe"
+                          WorkingDirectory="INSTALLFOLDER" 
+                          Icon="ClipConvertIcon.ico" 
+                          IconIndex="0" />
+                
+                <!-- Create Desktop shortcut -->
+                <Shortcut Id="DesktopShortcut" 
+                          Directory="DesktopFolder" 
+                          Name="ClipConvert" 
+                          Target="[INSTALLFOLDER]FileConvertor.exe"
+                          WorkingDirectory="INSTALLFOLDER" 
+                          Icon="ClipConvertIcon.ico" 
+                          IconIndex="0" />
+            </Component>
+            
+            <!-- Add main DLL -->
+            <Component Id="MainDll" Guid="*">
                 <File Id="FileConvertorDLL" 
                       Name="FileConvertor.dll" 
                       Source="$(var.BinDir)\FileConvertor.dll" 
                       KeyPath="yes" />
-                <!-- Additional DLLs would be listed here -->
+            </Component>
+            
+            <!-- Add all dependency DLLs from the bin directory - each in its own component -->
+            <!-- Material Design Themes -->
+            <Component Id="MaterialDesignThemesDLL" Guid="*">
+                <File Id="MaterialDesignThemesDLLFile" 
+                      Name="MaterialDesignThemes.Wpf.dll" 
+                      Source="$(var.BinDir)\MaterialDesignThemes.Wpf.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- Microsoft Extensions DI -->
+            <Component Id="MicrosoftExtensionsDependencyInjectionDLL" Guid="*">
+                <File Id="MicrosoftExtensionsDependencyInjectionDLLFile" 
+                      Name="Microsoft.Extensions.DependencyInjection.dll" 
+                      Source="$(var.BinDir)\Microsoft.Extensions.DependencyInjection.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- Microsoft Extensions DI Abstractions -->
+            <Component Id="MicrosoftExtensionsDependencyInjectionAbstractionsDLL" Guid="*">
+                <File Id="MicrosoftExtensionsDependencyInjectionAbstractionsDLLFile" 
+                      Name="Microsoft.Extensions.DependencyInjection.Abstractions.dll" 
+                      Source="$(var.BinDir)\Microsoft.Extensions.DependencyInjection.Abstractions.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- iText Commons -->
+            <Component Id="Itext7DLL" Guid="*">
+                <File Id="Itext7DLLFile" 
+                      Name="itext.commons.dll" 
+                      Source="$(var.BinDir)\itext.commons.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- Markdig -->
+            <Component Id="MarkdigDLL" Guid="*">
+                <File Id="MarkdigDLLFile" 
+                      Name="Markdig.dll" 
+                      Source="$(var.BinDir)\Markdig.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- DocumentFormat OpenXml -->
+            <Component Id="DocumentFormatOpenXmlDLL" Guid="*">
+                <File Id="DocumentFormatOpenXmlDLLFile" 
+                      Name="DocumentFormat.OpenXml.dll" 
+                      Source="$(var.BinDir)\DocumentFormat.OpenXml.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- NPOI Core -->
+            <Component Id="NPOICoreDLL" Guid="*">
+                <File Id="NPOICoreDLLFile" 
+                      Name="NPOI.Core.dll" 
+                      Source="$(var.BinDir)\NPOI.Core.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- NPOI OOXML -->
+            <Component Id="NPOIOOXMLCoreDLL" Guid="*">
+                <File Id="NPOIOOXMLDLLFile" 
+                      Name="NPOI.OOXML.dll" 
+                      Source="$(var.BinDir)\NPOI.OOXML.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- NPOI OpenXml4Net -->
+            <Component Id="NPOIOpenXml4NetDLL" Guid="*">
+                <File Id="NPOIOpenXml4NetDLLFile" 
+                      Name="NPOI.OpenXml4Net.dll" 
+                      Source="$(var.BinDir)\NPOI.OpenXml4Net.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- NPOI OpenXmlFormats -->
+            <Component Id="NPOIOpenXmlFormatsDLL" Guid="*">
+                <File Id="NPOIOpenXmlFormatsDLLFile" 
+                      Name="NPOI.OpenXmlFormats.dll" 
+                      Source="$(var.BinDir)\NPOI.OpenXmlFormats.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- ClosedXML -->
+            <Component Id="ClosedXMLDLL" Guid="*">
+                <File Id="ClosedXMLDLLFile" 
+                      Name="ClosedXML.dll" 
+                      Source="$(var.BinDir)\ClosedXML.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- SixLabors ImageSharp -->
+            <Component Id="SixLaborsImageSharpDLL" Guid="*">
+                <File Id="SixLaborsImageSharpDLLFile" 
+                      Name="SixLabors.ImageSharp.dll" 
+                      Source="$(var.BinDir)\SixLabors.ImageSharp.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- Magick.NET -->
+            <Component Id="MagickNETDLL" Guid="*">
+                <File Id="MagickNETDLLFile" 
+                      Name="Magick.NET-Q16-AnyCPU.dll" 
+                      Source="$(var.BinDir)\Magick.NET-Q16-AnyCPU.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- NAudio -->
+            <Component Id="NAudioDLL" Guid="*">
+                <File Id="NAudioDLLFile" 
+                      Name="NAudio.dll" 
+                      Source="$(var.BinDir)\NAudio.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- Xabe.FFmpeg -->
+            <Component Id="XabeFFmpegDLL" Guid="*">
+                <File Id="XabeFFmpegDLLFile" 
+                      Name="Xabe.FFmpeg.dll" 
+                      Source="$(var.BinDir)\Xabe.FFmpeg.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- SharpZipLib -->
+            <Component Id="SharpZipLibDLL" Guid="*">
+                <File Id="SharpZipLibDLLFile" 
+                      Name="ICSharpCode.SharpZipLib.dll" 
+                      Source="$(var.BinDir)\ICSharpCode.SharpZipLib.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- PdfSharp -->
+            <Component Id="PdfSharpDLL" Guid="*">
+                <File Id="PdfSharpDLLFile" 
+                      Name="PdfSharp.dll" 
+                      Source="$(var.BinDir)\PdfSharp.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- PdfPig -->
+            <Component Id="PdfPigDLL" Guid="*">
+                <File Id="PdfPigDLLFile" 
+                      Name="UglyToad.PdfPig.dll" 
+                      Source="$(var.BinDir)\UglyToad.PdfPig.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- RecyclableMemoryStream -->
+            <Component Id="MicrosoftIORecyclableMemoryStreamDLL" Guid="*">
+                <File Id="MicrosoftIORecyclableMemoryStreamDLLFile" 
+                      Name="Microsoft.IO.RecyclableMemoryStream.dll" 
+                      Source="$(var.BinDir)\Microsoft.IO.RecyclableMemoryStream.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- Additional Microsoft Extensions DLLs -->
+            <Component Id="MicrosoftExtensionsConfigurationDLL" Guid="*">
+                <File Id="MicrosoftExtensionsConfigurationDLLFile" 
+                      Name="Microsoft.Extensions.Configuration.dll" 
+                      Source="$(var.BinDir)\Microsoft.Extensions.Configuration.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="MicrosoftExtensionsConfigurationAbstractionsDLL" Guid="*">
+                <File Id="MicrosoftExtensionsConfigurationAbstractionsDLLFile" 
+                      Name="Microsoft.Extensions.Configuration.Abstractions.dll" 
+                      Source="$(var.BinDir)\Microsoft.Extensions.Configuration.Abstractions.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="MicrosoftExtensionsConfigurationBinderDLL" Guid="*">
+                <File Id="MicrosoftExtensionsConfigurationBinderDLLFile" 
+                      Name="Microsoft.Extensions.Configuration.Binder.dll" 
+                      Source="$(var.BinDir)\Microsoft.Extensions.Configuration.Binder.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="MicrosoftExtensionsLoggingDLL" Guid="*">
+                <File Id="MicrosoftExtensionsLoggingDLLFile" 
+                      Name="Microsoft.Extensions.Logging.dll" 
+                      Source="$(var.BinDir)\Microsoft.Extensions.Logging.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="MicrosoftExtensionsLoggingAbstractionsDLL" Guid="*">
+                <File Id="MicrosoftExtensionsLoggingAbstractionsDLLFile" 
+                      Name="Microsoft.Extensions.Logging.Abstractions.dll" 
+                      Source="$(var.BinDir)\Microsoft.Extensions.Logging.Abstractions.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="MicrosoftExtensionsLoggingConfigurationDLL" Guid="*">
+                <File Id="MicrosoftExtensionsLoggingConfigurationDLLFile" 
+                      Name="Microsoft.Extensions.Logging.Configuration.dll" 
+                      Source="$(var.BinDir)\Microsoft.Extensions.Logging.Configuration.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="MicrosoftExtensionsLoggingConsoleDLL" Guid="*">
+                <File Id="MicrosoftExtensionsLoggingConsoleDLLFile" 
+                      Name="Microsoft.Extensions.Logging.Console.dll" 
+                      Source="$(var.BinDir)\Microsoft.Extensions.Logging.Console.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="MicrosoftExtensionsOptionsDLL" Guid="*">
+                <File Id="MicrosoftExtensionsOptionsDLLFile" 
+                      Name="Microsoft.Extensions.Options.dll" 
+                      Source="$(var.BinDir)\Microsoft.Extensions.Options.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="MicrosoftExtensionsOptionsConfigurationExtensionsDLL" Guid="*">
+                <File Id="MicrosoftExtensionsOptionsConfigurationExtensionsDLLFile" 
+                      Name="Microsoft.Extensions.Options.ConfigurationExtensions.dll" 
+                      Source="$(var.BinDir)\Microsoft.Extensions.Options.ConfigurationExtensions.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="MicrosoftExtensionsPrimitivesDLL" Guid="*">
+                <File Id="MicrosoftExtensionsPrimitivesDLLFile" 
+                      Name="Microsoft.Extensions.Primitives.dll" 
+                      Source="$(var.BinDir)\Microsoft.Extensions.Primitives.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="MicrosoftDotNetPlatformAbstractionsDLL" Guid="*">
+                <File Id="MicrosoftDotNetPlatformAbstractionsDLLFile" 
+                      Name="Microsoft.DotNet.PlatformAbstractions.dll" 
+                      Source="$(var.BinDir)\Microsoft.DotNet.PlatformAbstractions.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="MicrosoftExtensionsDependencyModelDLL" Guid="*">
+                <File Id="MicrosoftExtensionsDependencyModelDLLFile" 
+                      Name="Microsoft.Extensions.DependencyModel.dll" 
+                      Source="$(var.BinDir)\Microsoft.Extensions.DependencyModel.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- Material Design Colors -->
+            <Component Id="MaterialDesignColorsDLL" Guid="*">
+                <File Id="MaterialDesignColorsDLLFile" 
+                      Name="MaterialDesignColors.dll" 
+                      Source="$(var.BinDir)\MaterialDesignColors.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- Microsoft Xaml Behaviors -->
+            <Component Id="MicrosoftXamlBehaviorsDLL" Guid="*">
+                <File Id="MicrosoftXamlBehaviorsDLLFile" 
+                      Name="Microsoft.Xaml.Behaviors.dll" 
+                      Source="$(var.BinDir)\Microsoft.Xaml.Behaviors.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- iText PDF Libraries -->
+            <Component Id="ItextBarcodesDLL" Guid="*">
+                <File Id="ItextBarcodesDLLFile" 
+                      Name="itext.barcodes.dll" 
+                      Source="$(var.BinDir)\itext.barcodes.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="ItextBouncyCastleAdapterDLL" Guid="*">
+                <File Id="ItextBouncyCastleAdapterDLLFile" 
+                      Name="itext.bouncy-castle-adapter.dll" 
+                      Source="$(var.BinDir)\itext.bouncy-castle-adapter.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="ItextBouncyCastleConnectorDLL" Guid="*">
+                <File Id="ItextBouncyCastleConnectorDLLFile" 
+                      Name="itext.bouncy-castle-connector.dll" 
+                      Source="$(var.BinDir)\itext.bouncy-castle-connector.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="ItextFormsDLL" Guid="*">
+                <File Id="ItextFormsDLLFile" 
+                      Name="itext.forms.dll" 
+                      Source="$(var.BinDir)\itext.forms.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="ItextHtml2pdfDLL" Guid="*">
+                <File Id="ItextHtml2pdfDLLFile" 
+                      Name="itext.html2pdf.dll" 
+                      Source="$(var.BinDir)\itext.html2pdf.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="ItextIoDLL" Guid="*">
+                <File Id="ItextIoDLLFile" 
+                      Name="itext.io.dll" 
+                      Source="$(var.BinDir)\itext.io.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="ItextKernelDLL" Guid="*">
+                <File Id="ItextKernelDLLFile" 
+                      Name="itext.kernel.dll" 
+                      Source="$(var.BinDir)\itext.kernel.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="ItextLayoutDLL" Guid="*">
+                <File Id="ItextLayoutDLLFile" 
+                      Name="itext.layout.dll" 
+                      Source="$(var.BinDir)\itext.layout.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="ItextPdfaDLL" Guid="*">
+                <File Id="ItextPdfaDLLFile" 
+                      Name="itext.pdfa.dll" 
+                      Source="$(var.BinDir)\itext.pdfa.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="ItextSignDLL" Guid="*">
+                <File Id="ItextSignDLLFile" 
+                      Name="itext.sign.dll" 
+                      Source="$(var.BinDir)\itext.sign.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="ItextStyledxmlparserDLL" Guid="*">
+                <File Id="ItextStyledxmlparserDLLFile" 
+                      Name="itext.styledxmlparser.dll" 
+                      Source="$(var.BinDir)\itext.styledxmlparser.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="ItextSvgDLL" Guid="*">
+                <File Id="ItextSvgDLLFile" 
+                      Name="itext.svg.dll" 
+                      Source="$(var.BinDir)\itext.svg.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- Document Format OpenXml Framework -->
+            <Component Id="DocumentFormatOpenXmlFrameworkDLL" Guid="*">
+                <File Id="DocumentFormatOpenXmlFrameworkDLLFile" 
+                      Name="DocumentFormat.OpenXml.Framework.dll" 
+                      Source="$(var.BinDir)\DocumentFormat.OpenXml.Framework.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- Excel Number Format -->
+            <Component Id="ExcelNumberFormatDLL" Guid="*">
+                <File Id="ExcelNumberFormatDLLFile" 
+                      Name="ExcelNumberFormat.dll" 
+                      Source="$(var.BinDir)\ExcelNumberFormat.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- XLParser -->
+            <Component Id="XLParserDLL" Guid="*">
+                <File Id="XLParserDLLFile" 
+                      Name="XLParser.dll" 
+                      Source="$(var.BinDir)\XLParser.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- Irony -->
+            <Component Id="IronyDLL" Guid="*">
+                <File Id="IronyDLLFile" 
+                      Name="Irony.dll" 
+                      Source="$(var.BinDir)\Irony.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- SixLabors Fonts -->
+            <Component Id="SixLaborsFontsDLL" Guid="*">
+                <File Id="SixLaborsFontsDLLFile" 
+                      Name="SixLabors.Fonts.dll" 
+                      Source="$(var.BinDir)\SixLabors.Fonts.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- Magick.NET Core -->
+            <Component Id="MagickNETCoreDLL" Guid="*">
+                <File Id="MagickNETCoreDLLFile" 
+                      Name="Magick.NET.Core.dll" 
+                      Source="$(var.BinDir)\Magick.NET.Core.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- NAudio Components -->
+            <Component Id="NAudioAsioDLL" Guid="*">
+                <File Id="NAudioAsioDLLFile" 
+                      Name="NAudio.Asio.dll" 
+                      Source="$(var.BinDir)\NAudio.Asio.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="NAudioCoreDLL" Guid="*">
+                <File Id="NAudioCoreDLLFile" 
+                      Name="NAudio.Core.dll" 
+                      Source="$(var.BinDir)\NAudio.Core.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="NAudioMidiDLL" Guid="*">
+                <File Id="NAudioMidiDLLFile" 
+                      Name="NAudio.Midi.dll" 
+                      Source="$(var.BinDir)\NAudio.Midi.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="NAudioWasapiDLL" Guid="*">
+                <File Id="NAudioWasapiDLLFile" 
+                      Name="NAudio.Wasapi.dll" 
+                      Source="$(var.BinDir)\NAudio.Wasapi.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="NAudioWinFormsDLL" Guid="*">
+                <File Id="NAudioWinFormsDLLFile" 
+                      Name="NAudio.WinForms.dll" 
+                      Source="$(var.BinDir)\NAudio.WinForms.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="NAudioWinMMDLL" Guid="*">
+                <File Id="NAudioWinMMDLLFile" 
+                      Name="NAudio.WinMM.dll" 
+                      Source="$(var.BinDir)\NAudio.WinMM.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- Utilities -->
+            <Component Id="BouncyCastleCryptographyDLL" Guid="*">
+                <File Id="BouncyCastleCryptographyDLLFile" 
+                      Name="BouncyCastle.Cryptography.dll" 
+                      Source="$(var.BinDir)\BouncyCastle.Cryptography.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="EnumsNETDLL" Guid="*">
+                <File Id="EnumsNETDLLFile" 
+                      Name="Enums.NET.dll" 
+                      Source="$(var.BinDir)\Enums.NET.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="NewtonsoftJsonDLL" Guid="*">
+                <File Id="NewtonsoftJsonDLLFile" 
+                      Name="Newtonsoft.Json.dll" 
+                      Source="$(var.BinDir)\Newtonsoft.Json.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="MathNetNumericsDLL" Guid="*">
+                <File Id="MathNetNumericsDLLFile" 
+                      Name="MathNet.Numerics.dll" 
+                      Source="$(var.BinDir)\MathNet.Numerics.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- PDF Libraries -->
+            <Component Id="PdfSharpChartingDLL" Guid="*">
+                <File Id="PdfSharpChartingDLLFile" 
+                      Name="PdfSharp.Charting.dll" 
+                      Source="$(var.BinDir)\PdfSharp.Charting.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="PdfSharpQualityDLL" Guid="*">
+                <File Id="PdfSharpQualityDLLFile" 
+                      Name="PdfSharp.Quality.dll" 
+                      Source="$(var.BinDir)\PdfSharp.Quality.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="PdfSharpSnippetsDLL" Guid="*">
+                <File Id="PdfSharpSnippetsDLLFile" 
+                      Name="PdfSharp.Snippets.dll" 
+                      Source="$(var.BinDir)\PdfSharp.Snippets.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="PdfSharpSystemDLL" Guid="*">
+                <File Id="PdfSharpSystemDLLFile" 
+                      Name="PdfSharp.System.dll" 
+                      Source="$(var.BinDir)\PdfSharp.System.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="PdfSharpWPFontsDLL" Guid="*">
+                <File Id="PdfSharpWPFontsDLLFile" 
+                      Name="PdfSharp.WPFonts.dll" 
+                      Source="$(var.BinDir)\PdfSharp.WPFonts.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="PdfPigCoreDLL" Guid="*">
+                <File Id="PdfPigCoreDLLFile" 
+                      Name="UglyToad.PdfPig.Core.dll" 
+                      Source="$(var.BinDir)\UglyToad.PdfPig.Core.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="PdfPigDocumentLayoutAnalysisDLL" Guid="*">
+                <File Id="PdfPigDocumentLayoutAnalysisDLLFile" 
+                      Name="UglyToad.PdfPig.DocumentLayoutAnalysis.dll" 
+                      Source="$(var.BinDir)\UglyToad.PdfPig.DocumentLayoutAnalysis.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="PdfPigFontsDLL" Guid="*">
+                <File Id="PdfPigFontsDLLFile" 
+                      Name="UglyToad.PdfPig.Fonts.dll" 
+                      Source="$(var.BinDir)\UglyToad.PdfPig.Fonts.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="PdfPigPackageDLL" Guid="*">
+                <File Id="PdfPigPackageDLLFile" 
+                      Name="UglyToad.PdfPig.Package.dll" 
+                      Source="$(var.BinDir)\UglyToad.PdfPig.Package.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="PdfPigTokenizationDLL" Guid="*">
+                <File Id="PdfPigTokenizationDLLFile" 
+                      Name="UglyToad.PdfPig.Tokenization.dll" 
+                      Source="$(var.BinDir)\UglyToad.PdfPig.Tokenization.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="PdfPigTokensDLL" Guid="*">
+                <File Id="PdfPigTokensDLLFile" 
+                      Name="UglyToad.PdfPig.Tokens.dll" 
+                      Source="$(var.BinDir)\UglyToad.PdfPig.Tokens.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+        </DirectoryRef>
+        
+        <!-- Define German localization resources -->
+        <DirectoryRef Id="DEDIR">
+            <Component Id="PdfSharpChartingResourcesDLL" Guid="*">
+                <File Id="PdfSharpChartingResourcesDLLFile" 
+                      Name="PdfSharp.Charting.resources.dll" 
+                      Source="$(var.BinDir)\de\PdfSharp.Charting.resources.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="PdfSharpResourcesDLL" Guid="*">
+                <File Id="PdfSharpResourcesDLLFile" 
+                      Name="PdfSharp.resources.dll" 
+                      Source="$(var.BinDir)\de\PdfSharp.resources.dll" 
+                      KeyPath="yes" />
+            </Component>
+        </DirectoryRef>
+        
+        <!-- Define native runtime libraries -->
+        <DirectoryRef Id="WINARM64NATIVEDIR">
+            <Component Id="MagickNativeArm64DLL" Guid="*">
+                <File Id="MagickNativeArm64DLLFile" 
+                      Name="Magick.Native-Q16-arm64.dll" 
+                      Source="$(var.BinDir)\runtimes\win-arm64\native\Magick.Native-Q16-arm64.dll" 
+                      KeyPath="yes" />
+            </Component>
+        </DirectoryRef>
+        
+        <DirectoryRef Id="WINX64NATIVEDIR">
+            <Component Id="MagickNativeX64DLL" Guid="*">
+                <File Id="MagickNativeX64DLLFile" 
+                      Name="Magick.Native-Q16-x64.dll" 
+                      Source="$(var.BinDir)\runtimes\win-x64\native\Magick.Native-Q16-x64.dll" 
+                      KeyPath="yes" />
+            </Component>
+        </DirectoryRef>
+        
+        <DirectoryRef Id="WINX86NATIVEDIR">
+            <Component Id="MagickNativeX86DLL" Guid="*">
+                <File Id="MagickNativeX86DLLFile" 
+                      Name="Magick.Native-Q16-x86.dll" 
+                      Source="$(var.BinDir)\runtimes\win-x86\native\Magick.Native-Q16-x86.dll" 
+                      KeyPath="yes" />
+            </Component>
+        </DirectoryRef>
+        
+        <DirectoryRef Id="INSTALLFOLDER">
+            <!-- Dependencies Registry Entry -->
+            <Component Id="DependenciesRegistry" Guid="*">
+                <RegistryValue Root="HKCU" 
+                               Key="Software\FourTwentyDev\ClipConvert" 
+                               Name="dependencies_installed" 
+                               Type="integer" 
+                               Value="1" 
+                               KeyPath="yes" />
             </Component>
             
             <!-- Configuration files -->
@@ -94,6 +716,16 @@
                       Source="$(var.BinDir)\FileConvertor.deps.json" 
                       KeyPath="yes" />
             </Component>
+            
+            <!-- Assets directory -->
+            <Directory Id="ASSETSDIR" Name="Assets">
+                <Component Id="AppIconFile" Guid="*">
+                    <File Id="AppIconIco" 
+                          Name="app_icon.ico" 
+                          Source="$(var.BinDir)\Assets\app_icon.ico" 
+                          KeyPath="yes" />
+                </Component>
+            </Directory>
             
             <!-- Auto-start with Windows -->
             <Component Id="RegistryEntries" Guid="*">
@@ -117,12 +749,115 @@
         <!-- Define features -->
         <Feature Id="ProductFeature" Title="ClipConvert" Level="1">
             <ComponentRef Id="MainExecutable" />
-            <ComponentRef Id="DependencyDlls" />
+            <ComponentRef Id="MainDll" />
+            
+            <!-- Core DLL components -->
+            <ComponentRef Id="MaterialDesignThemesDLL" />
+            <ComponentRef Id="MaterialDesignColorsDLL" />
+            <ComponentRef Id="MicrosoftXamlBehaviorsDLL" />
+            
+            <!-- Microsoft Extensions -->
+            <ComponentRef Id="MicrosoftExtensionsDependencyInjectionDLL" />
+            <ComponentRef Id="MicrosoftExtensionsDependencyInjectionAbstractionsDLL" />
+            <ComponentRef Id="MicrosoftExtensionsConfigurationDLL" />
+            <ComponentRef Id="MicrosoftExtensionsConfigurationAbstractionsDLL" />
+            <ComponentRef Id="MicrosoftExtensionsConfigurationBinderDLL" />
+            <ComponentRef Id="MicrosoftExtensionsLoggingDLL" />
+            <ComponentRef Id="MicrosoftExtensionsLoggingAbstractionsDLL" />
+            <ComponentRef Id="MicrosoftExtensionsLoggingConfigurationDLL" />
+            <ComponentRef Id="MicrosoftExtensionsLoggingConsoleDLL" />
+            <ComponentRef Id="MicrosoftExtensionsOptionsDLL" />
+            <ComponentRef Id="MicrosoftExtensionsOptionsConfigurationExtensionsDLL" />
+            <ComponentRef Id="MicrosoftExtensionsPrimitivesDLL" />
+            <ComponentRef Id="MicrosoftDotNetPlatformAbstractionsDLL" />
+            <ComponentRef Id="MicrosoftExtensionsDependencyModelDLL" />
+            <ComponentRef Id="MicrosoftIORecyclableMemoryStreamDLL" />
+            
+            <!-- iText PDF -->
+            <ComponentRef Id="Itext7DLL" />
+            <ComponentRef Id="ItextBarcodesDLL" />
+            <ComponentRef Id="ItextBouncyCastleAdapterDLL" />
+            <ComponentRef Id="ItextBouncyCastleConnectorDLL" />
+            <ComponentRef Id="ItextFormsDLL" />
+            <ComponentRef Id="ItextHtml2pdfDLL" />
+            <ComponentRef Id="ItextIoDLL" />
+            <ComponentRef Id="ItextKernelDLL" />
+            <ComponentRef Id="ItextLayoutDLL" />
+            <ComponentRef Id="ItextPdfaDLL" />
+            <ComponentRef Id="ItextSignDLL" />
+            <ComponentRef Id="ItextStyledxmlparserDLL" />
+            <ComponentRef Id="ItextSvgDLL" />
+            
+            <!-- Document Processing -->
+            <ComponentRef Id="MarkdigDLL" />
+            <ComponentRef Id="DocumentFormatOpenXmlDLL" />
+            <ComponentRef Id="DocumentFormatOpenXmlFrameworkDLL" />
+            <ComponentRef Id="NPOICoreDLL" />
+            <ComponentRef Id="NPOIOOXMLCoreDLL" />
+            <ComponentRef Id="NPOIOpenXml4NetDLL" />
+            <ComponentRef Id="NPOIOpenXmlFormatsDLL" />
+            <ComponentRef Id="ClosedXMLDLL" />
+            <ComponentRef Id="ExcelNumberFormatDLL" />
+            <ComponentRef Id="XLParserDLL" />
+            <ComponentRef Id="IronyDLL" />
+            
+            <!-- Image Processing -->
+            <ComponentRef Id="SixLaborsImageSharpDLL" />
+            <ComponentRef Id="SixLaborsFontsDLL" />
+            <ComponentRef Id="MagickNETDLL" />
+            <ComponentRef Id="MagickNETCoreDLL" />
+            
+            <!-- Audio Processing -->
+            <ComponentRef Id="NAudioDLL" />
+            <ComponentRef Id="NAudioAsioDLL" />
+            <ComponentRef Id="NAudioCoreDLL" />
+            <ComponentRef Id="NAudioMidiDLL" />
+            <ComponentRef Id="NAudioWasapiDLL" />
+            <ComponentRef Id="NAudioWinFormsDLL" />
+            <ComponentRef Id="NAudioWinMMDLL" />
+            <ComponentRef Id="XabeFFmpegDLL" />
+            
+            <!-- Utilities -->
+            <ComponentRef Id="SharpZipLibDLL" />
+            <ComponentRef Id="BouncyCastleCryptographyDLL" />
+            <ComponentRef Id="EnumsNETDLL" />
+            <ComponentRef Id="NewtonsoftJsonDLL" />
+            <ComponentRef Id="MathNetNumericsDLL" />
+            
+            <!-- PDF Libraries -->
+            <ComponentRef Id="PdfSharpDLL" />
+            <ComponentRef Id="PdfSharpChartingDLL" />
+            <ComponentRef Id="PdfSharpQualityDLL" />
+            <ComponentRef Id="PdfSharpSnippetsDLL" />
+            <ComponentRef Id="PdfSharpSystemDLL" />
+            <ComponentRef Id="PdfSharpWPFontsDLL" />
+            <ComponentRef Id="PdfPigDLL" />
+            <ComponentRef Id="PdfPigCoreDLL" />
+            <ComponentRef Id="PdfPigDocumentLayoutAnalysisDLL" />
+            <ComponentRef Id="PdfPigFontsDLL" />
+            <ComponentRef Id="PdfPigPackageDLL" />
+            <ComponentRef Id="PdfPigTokenizationDLL" />
+            <ComponentRef Id="PdfPigTokensDLL" />
+            
+            <!-- Localization Resources -->
+            <ComponentRef Id="PdfSharpChartingResourcesDLL" />
+            <ComponentRef Id="PdfSharpResourcesDLL" />
+            
+            <!-- Native Libraries -->
+            <ComponentRef Id="MagickNativeArm64DLL" />
+            <ComponentRef Id="MagickNativeX64DLL" />
+            <ComponentRef Id="MagickNativeX86DLL" />
+            
+            <!-- Configuration Files -->
+            <ComponentRef Id="DependenciesRegistry" />
             <ComponentRef Id="RuntimeConfigFile" />
             <ComponentRef Id="DepsFile" />
             <ComponentRef Id="StartMenuShortcuts" />
             <ComponentRef Id="RegistryEntries" />
-            <!-- Additional component references would be added here -->
+            <ComponentRef Id="ApplicationShortcuts" />
+            
+            <!-- Assets -->
+            <ComponentRef Id="AppIconFile" />
         </Feature>
         
         <!-- Define icons -->

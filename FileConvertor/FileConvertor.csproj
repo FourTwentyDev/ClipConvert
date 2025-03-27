@@ -19,6 +19,7 @@
     <PackageProjectUrl>https://github.com/FourTwentyDev/ClipConvert</PackageProjectUrl>
     <RepositoryUrl>https://github.com/FourTwentyDev/ClipConvert</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <ApplicationIcon>Assets\app_icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <!-- Removed FrameworkReference as it's implicitly included by the SDK -->
@@ -50,5 +51,10 @@
     <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="2.3.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Assets\app_icon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
 </Project>

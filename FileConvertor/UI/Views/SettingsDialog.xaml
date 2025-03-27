@@ -9,6 +9,7 @@
         Title="Settings" 
         Height="400" 
         Width="480"
+        Icon="/Assets/app_icon.ico"
         WindowStartupLocation="CenterScreen"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
