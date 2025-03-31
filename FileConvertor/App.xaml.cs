@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
+﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows;
@@ -14,6 +14,7 @@ using FileConvertor.Core.Services;
 using FileConvertor.UI.ViewModels;
 using FileConvertor.UI.Views;
 using Microsoft.Extensions.DependencyInjection;
+using System.Threading.Tasks;
 
 namespace FileConvertor
 {
@@ -26,9 +27,11 @@ namespace FileConvertor
         private IHotkeyService? _hotkeyService;
         private IClipboardService? _clipboardService;
         private ISettingsService? _settingsService;
+        private IUpdateService? _updateService;
         private NotifyIcon? _notifyIcon;
         private ConversionDialog? _mainWindow;
         private SettingsDialog? _settingsDialog;
+        private bool _updateAvailable;
 
         /// <summary>
         /// Initializes a new instance of the App class
@@ -52,6 +55,7 @@ namespace FileConvertor
             // Register services
             services.AddSingleton<IClipboardService, ClipboardService>();
             services.AddSingleton<ISettingsService, SettingsService>();
+            services.AddSingleton<IUpdateService, UpdateService>();
             
             // Create and configure the converter factory with lazy loading
             services.AddSingleton<ConverterFactory>(provider =>
@@ -152,6 +156,13 @@ namespace FileConvertor
             var viewLogItem = new ToolStripMenuItem("View Log File");
             viewLogItem.Click += (s, e) => OpenLogFile();
             contextMenu.Items.Add(viewLogItem);
+            
+            // Add an update item (initially hidden)
+            var updateItem = new ToolStripMenuItem("Update Available");
+            updateItem.Visible = false;
+            updateItem.Image = SystemIcons.Information.ToBitmap();
+            updateItem.Click += (s, e) => DownloadUpdate();
+            contextMenu.Items.Add(updateItem);
             
             _notifyIcon.ContextMenuStrip = contextMenu;
             
@@ -272,6 +283,30 @@ namespace FileConvertor
                 () => CheckClipboardAndShowWindow());
             _hotkeyService.StartListening();
             
+            // Initialize the update service
+            _updateService = _serviceProvider.GetRequiredService<IUpdateService>();
+            _updateService.UpdateAvailable += UpdateService_UpdateAvailable;
+            
+            // Check for updates if enabled
+            if (settings.AutoCheckForUpdates)
+            {
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        // Wait a bit to let the app finish starting up
+                        await Task.Delay(3000);
+                        
+                        // Check for updates
+                        await _updateService.CheckForUpdateAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogException(LogLevel.Error, "App", "Error checking for updates", ex);
+                    }
+                });
+            }
+            
             // Show a notification that the app is running
             _notifyIcon?.ShowBalloonTip(
                 3000, 
@@ -351,6 +386,71 @@ namespace FileConvertor
                     ToolTipIcon.Error);
                 
                 Logger.LogException(LogLevel.Error, "App", "Error opening log file", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the update available event
+        /// </summary>
+        /// <param name="sender">Event sender</param>
+        /// <param name="e">Event args</param>
+        private void UpdateService_UpdateAvailable(object? sender, UpdateAvailableEventArgs e)
+        {
+            try
+            {
+                // Update the update available flag
+                _updateAvailable = true;
+                
+                // Update the context menu
+                if (_notifyIcon?.ContextMenuStrip != null)
+                {
+                    // Find the update item
+                    foreach (ToolStripItem item in _notifyIcon.ContextMenuStrip.Items)
+                    {
+                        if (item is ToolStripMenuItem menuItem && menuItem.Text == "Update Available")
+                        {
+                            // Update the UI on the UI thread
+                            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                menuItem.Visible = true;
+                                menuItem.Text = $"Update Available: {e.CurrentVersion} → {e.LatestVersion}";
+                            });
+                            break;
+                        }
+                    }
+                }
+                
+                // Show a notification
+                _notifyIcon?.ShowBalloonTip(
+                    5000, 
+                    "Update Available", 
+                    $"A new version of ClipConvert is available: {e.LatestVersion}\nRight-click the tray icon to update.", 
+                    ToolTipIcon.Info);
+                
+                Logger.Log(LogLevel.Info, "App", $"Update available: {e.CurrentVersion} → {e.LatestVersion}");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(LogLevel.Error, "App", "Error handling update available event", ex);
+            }
+        }
+        
+        /// <summary>
+        /// Downloads the latest update
+        /// </summary>
+        private void DownloadUpdate()
+        {
+            try
+            {
+                if (_updateService != null)
+                {
+                    _updateService.DownloadUpdate();
+                    Logger.Log(LogLevel.Info, "App", "Opening update download page");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(LogLevel.Error, "App", "Error downloading update", ex);
             }
         }
 

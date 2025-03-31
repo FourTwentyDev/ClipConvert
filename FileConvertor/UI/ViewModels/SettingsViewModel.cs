@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using FileConvertor.Core.Interfaces;
 using FileConvertor.Core.Logging;
@@ -16,6 +17,7 @@ namespace FileConvertor.UI.ViewModels
     {
         private readonly ISettingsService _settingsService;
         private readonly IHotkeyService? _hotkeyService;
+        private readonly IUpdateService? _updateService;
 
         private string _hotkeyDisplayText;
         private bool _isRecordingHotkey;
@@ -26,6 +28,11 @@ namespace FileConvertor.UI.ViewModels
         private string _statusMessage = string.Empty;
         private bool _isSuccess;
         private bool _isError;
+        private bool _autoCheckForUpdates;
+        private string _currentVersion = string.Empty;
+        private string _latestVersion = string.Empty;
+        private bool _updateAvailable;
+        private bool _isCheckingForUpdates;
 
         /// <summary>
         /// Gets or sets the hotkey display text
@@ -149,6 +156,57 @@ namespace FileConvertor.UI.ViewModels
             get => _isError;
             set => SetProperty(ref _isError, value);
         }
+        
+        /// <summary>
+        /// Gets or sets whether automatic update checking is enabled
+        /// </summary>
+        public bool AutoCheckForUpdates
+        {
+            get => _autoCheckForUpdates;
+            set => SetProperty(ref _autoCheckForUpdates, value);
+        }
+        
+        /// <summary>
+        /// Gets or sets the current application version
+        /// </summary>
+        public string CurrentVersion
+        {
+            get => _currentVersion;
+            set => SetProperty(ref _currentVersion, value);
+        }
+        
+        /// <summary>
+        /// Gets or sets the latest available version
+        /// </summary>
+        public string LatestVersion
+        {
+            get => _latestVersion;
+            set => SetProperty(ref _latestVersion, value);
+        }
+        
+        /// <summary>
+        /// Gets or sets whether an update is available
+        /// </summary>
+        public bool UpdateAvailable
+        {
+            get => _updateAvailable;
+            set => SetProperty(ref _updateAvailable, value);
+        }
+        
+        /// <summary>
+        /// Gets or sets whether the application is currently checking for updates
+        /// </summary>
+        public bool IsCheckingForUpdates
+        {
+            get => _isCheckingForUpdates;
+            set
+            {
+                if (SetProperty(ref _isCheckingForUpdates, value))
+                {
+                    CheckForUpdatesCommand.RaiseCanExecuteChanged();
+                }
+            }
+        }
 
         /// <summary>
         /// Gets the command to record a hotkey
@@ -169,16 +227,31 @@ namespace FileConvertor.UI.ViewModels
         /// Gets the command to reset settings to defaults
         /// </summary>
         public RelayCommand ResetCommand { get; }
+        
+        /// <summary>
+        /// Gets the command to check for updates
+        /// </summary>
+        public RelayCommand CheckForUpdatesCommand { get; }
+        
+        /// <summary>
+        /// Gets the command to download the latest update
+        /// </summary>
+        public RelayCommand DownloadUpdateCommand { get; }
 
         /// <summary>
         /// Initializes a new instance of the SettingsViewModel class
         /// </summary>
         /// <param name="settingsService">Settings service</param>
         /// <param name="hotkeyService">Hotkey service (optional)</param>
-        public SettingsViewModel(ISettingsService settingsService, IHotkeyService? hotkeyService = null)
+        /// <param name="updateService">Update service (optional)</param>
+        public SettingsViewModel(
+            ISettingsService settingsService, 
+            IHotkeyService? hotkeyService = null,
+            IUpdateService? updateService = null)
         {
             _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
             _hotkeyService = hotkeyService;
+            _updateService = updateService;
             
             // Initialize from current settings
             var settings = _settingsService.CurrentSettings;
@@ -190,11 +263,24 @@ namespace FileConvertor.UI.ViewModels
             _isShiftModifierActive = (settings.HotkeyModifiers & HotkeyService.MOD_SHIFT) != 0;
             _isWinModifierActive = (settings.HotkeyModifiers & HotkeyService.MOD_WIN) != 0;
             
+            // Initialize update settings
+            _autoCheckForUpdates = settings.AutoCheckForUpdates;
+            _latestVersion = settings.LatestAvailableVersion;
+            _updateAvailable = settings.UpdateAvailable;
+            
+            // Get current version from the update service
+            if (_updateService != null)
+            {
+                _currentVersion = _updateService.GetCurrentVersion();
+            }
+            
             // Initialize commands
             RecordHotkeyCommand = new RelayCommand(_ => StartRecordingHotkey(), _ => !IsRecordingHotkey);
             SaveCommand = new RelayCommand(_ => SaveSettings(), _ => !IsRecordingHotkey);
             CloseCommand = new RelayCommand(_ => CloseDialog());
             ResetCommand = new RelayCommand(_ => ResetToDefaults());
+            CheckForUpdatesCommand = new RelayCommand(_ => CheckForUpdatesAsync(), _ => !IsCheckingForUpdates);
+            DownloadUpdateCommand = new RelayCommand(_ => DownloadUpdate(), _ => UpdateAvailable);
         }
 
         /// <summary>
@@ -334,14 +420,25 @@ namespace FileConvertor.UI.ViewModels
                 // Convert the key to a virtual key code
                 int keyCode = KeyInterop.VirtualKeyFromKey(key);
                 
+                // Get the current settings
+                var settings = _settingsService.CurrentSettings;
+                
+                // Update hotkey settings
+                settings.HotkeyModifiers = modifiers;
+                settings.HotkeyKey = keyCode;
+                settings.HotkeyDisplayText = HotkeyDisplayText;
+                
+                // Update update settings
+                settings.AutoCheckForUpdates = AutoCheckForUpdates;
+                
                 // Save the settings
-                if (_settingsService.UpdateHotkey(modifiers, keyCode, HotkeyDisplayText))
+                if (_settingsService.SaveSettings(settings))
                 {
                     StatusMessage = "Settings saved successfully";
                     IsSuccess = true;
                     IsError = false;
                     
-                    Logger.Log(LogLevel.Info, "SettingsViewModel", $"Hotkey updated to {HotkeyDisplayText}");
+                    Logger.Log(LogLevel.Info, "SettingsViewModel", $"Settings updated: Hotkey={HotkeyDisplayText}, AutoCheckForUpdates={AutoCheckForUpdates}");
                 }
                 else
                 {
@@ -392,6 +489,7 @@ namespace FileConvertor.UI.ViewModels
                 IsAltModifierActive = (defaultSettings.HotkeyModifiers & HotkeyService.MOD_ALT) != 0;
                 IsShiftModifierActive = (defaultSettings.HotkeyModifiers & HotkeyService.MOD_SHIFT) != 0;
                 IsWinModifierActive = (defaultSettings.HotkeyModifiers & HotkeyService.MOD_WIN) != 0;
+                AutoCheckForUpdates = defaultSettings.AutoCheckForUpdates;
                 
                 // Save the settings
                 if (_settingsService.SaveSettings(defaultSettings))
@@ -418,6 +516,93 @@ namespace FileConvertor.UI.ViewModels
                 IsError = true;
                 
                 Logger.LogException(LogLevel.Error, "SettingsViewModel", "Error resetting settings", ex);
+            }
+        }
+        
+        /// <summary>
+        /// Checks for updates asynchronously
+        /// </summary>
+        private async void CheckForUpdatesAsync()
+        {
+            if (_updateService == null)
+            {
+                StatusMessage = "Update service not available";
+                IsError = true;
+                return;
+            }
+            
+            try
+            {
+                // Set checking state
+                IsCheckingForUpdates = true;
+                StatusMessage = "Checking for updates...";
+                IsSuccess = false;
+                IsError = false;
+                
+                // Check for updates
+                var isUpdateAvailable = await _updateService.CheckForUpdateAsync();
+                
+                // Get the latest version
+                var latestVersion = await _updateService.GetLatestVersionAsync();
+                LatestVersion = latestVersion;
+                UpdateAvailable = isUpdateAvailable;
+                
+                // Update the UI
+                if (isUpdateAvailable)
+                {
+                    StatusMessage = $"Update available: {CurrentVersion} → {LatestVersion}";
+                    IsSuccess = true;
+                }
+                else
+                {
+                    StatusMessage = $"You have the latest version ({CurrentVersion})";
+                    IsSuccess = true;
+                }
+                
+                Logger.Log(LogLevel.Info, "SettingsViewModel", $"Update check completed. Current: {CurrentVersion}, Latest: {LatestVersion}, Update available: {isUpdateAvailable}");
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Error checking for updates: {ex.Message}";
+                IsError = true;
+                
+                Logger.LogException(LogLevel.Error, "SettingsViewModel", "Error checking for updates", ex);
+            }
+            finally
+            {
+                // Reset checking state
+                IsCheckingForUpdates = false;
+            }
+        }
+        
+        /// <summary>
+        /// Downloads the latest update
+        /// </summary>
+        private void DownloadUpdate()
+        {
+            if (_updateService == null)
+            {
+                StatusMessage = "Update service not available";
+                IsError = true;
+                return;
+            }
+            
+            try
+            {
+                // Open the download page
+                _updateService.DownloadUpdate();
+                
+                StatusMessage = "Opening download page...";
+                IsSuccess = true;
+                
+                Logger.Log(LogLevel.Info, "SettingsViewModel", "Opening update download page");
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Error opening download page: {ex.Message}";
+                IsError = true;
+                
+                Logger.LogException(LogLevel.Error, "SettingsViewModel", "Error opening download page", ex);
             }
         }
     }

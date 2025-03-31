@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using FileConvertor.Core.Interfaces;
 using FileConvertor.UI.ViewModels;
 
 namespace FileConvertor.UI.Views
@@ -19,7 +20,8 @@ namespace FileConvertor.UI.Views
         /// Initializes a new instance of the SettingsDialog class
         /// </summary>
         /// <param name="viewModel">ViewModel for the dialog</param>
-        public SettingsDialog(SettingsViewModel viewModel)
+        /// <param name="updateService">Update service (optional)</param>
+        public SettingsDialog(SettingsViewModel viewModel, IUpdateService? updateService = null)
         {
             try
             {

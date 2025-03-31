@@ -7,8 +7,8 @@
         xmlns:local="clr-namespace:FileConvertor.UI.Views"
         mc:Ignorable="d"
         Title="Settings" 
-        Height="400" 
-        Width="480"
+        Height="500" 
+        Width="500"
         Icon="/Assets/app_icon.ico"
         WindowStartupLocation="CenterScreen"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
@@ -134,8 +134,88 @@
                     </Grid>
                 </materialDesign:Card>
 
-                <!-- About Section -->
+                <!-- Updates Section -->
                 <materialDesign:Card Grid.Row="1" Margin="0,0,0,16" UniformCornerRadius="6" 
+                                   Padding="16" Background="{DynamicResource MaterialDesignCardBackground}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <!-- Section Title -->
+                        <TextBlock Grid.Row="0" Text="Updates" 
+                                   Style="{StaticResource MaterialDesignSubtitle1TextBlock}" 
+                                   Margin="0,0,0,16"/>
+                        
+                        <!-- Auto-update checkbox -->
+                        <CheckBox Grid.Row="1" Content="Automatically check for updates" 
+                                  IsChecked="{Binding AutoCheckForUpdates}" 
+                                  Margin="0,0,0,16"/>
+                        
+                        <!-- Version info -->
+                        <Grid Grid.Row="2" Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,16,0">
+                                <TextBlock Text="Current Version:" Margin="0,0,0,4"/>
+                                <TextBlock Text="Latest Version:" Margin="0,0,0,0"/>
+                            </StackPanel>
+                            
+                            <StackPanel Grid.Column="1" Orientation="Vertical">
+                                <TextBlock Text="{Binding CurrentVersion}" FontWeight="Medium" Margin="0,0,0,4"/>
+                                <TextBlock Text="{Binding LatestVersion}" FontWeight="Medium" 
+                                           Foreground="{Binding UpdateAvailable, Converter={StaticResource BooleanToColorConverter}, ConverterParameter='#4CAF50,#757575'}"/>
+                            </StackPanel>
+                            
+                            <materialDesign:PackIcon Grid.Column="2" Kind="CheckCircle" 
+                                                   Visibility="{Binding UpdateAvailable, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                                                   Foreground="#4CAF50" 
+                                                   Width="24" Height="24" 
+                                                   VerticalAlignment="Center"/>
+                            
+                            <materialDesign:PackIcon Grid.Column="2" Kind="ArrowUpBold" 
+                                                   Visibility="{Binding UpdateAvailable, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                   Foreground="#FF9800" 
+                                                   Width="24" Height="24" 
+                                                   VerticalAlignment="Center"/>
+                        </Grid>
+                        
+                        <!-- Update buttons -->
+                        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Command="{Binding CheckForUpdatesCommand}" 
+                                    Style="{StaticResource MaterialDesignOutlinedButton}" 
+                                    Margin="0,0,8,0"
+                                    IsEnabled="{Binding IsCheckingForUpdates, Converter={StaticResource InverseBooleanConverter}}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="Refresh" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Check for Updates"/>
+                                </StackPanel>
+                            </Button>
+                            
+                            <Button Command="{Binding DownloadUpdateCommand}" 
+                                    Style="{StaticResource MaterialDesignRaisedButton}" 
+                                    materialDesign:ButtonAssist.CornerRadius="4"
+                                    Background="#4CAF50"
+                                    Foreground="White"
+                                    Visibility="{Binding UpdateAvailable, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="Download" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Download Update"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </materialDesign:Card>
+                
+                <!-- About Section -->
+                <materialDesign:Card Grid.Row="2" Margin="0,0,0,16" UniformCornerRadius="6" 
                                    Padding="16" Background="{DynamicResource MaterialDesignCardBackground}">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -186,7 +266,7 @@
                 </materialDesign:Card>
                 
                 <!-- Action Buttons -->
-                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,16">
+                <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,16">
                     <Button Command="{Binding SaveCommand}" 
                             Style="{StaticResource MaterialDesignRaisedButton}" 
                             materialDesign:ButtonAssist.CornerRadius="4" 
