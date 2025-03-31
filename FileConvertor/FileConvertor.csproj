@@ -11,7 +11,7 @@
     <!-- Disable auto-generation of assembly attributes that we've defined in AssemblyInfo.cs -->
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Product>ClipConvert</Product>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>FourTwentyDev</Authors>
     <Company>FourTwentyDev</Company>
     <Description>On-the-fly file converter that works directly with your clipboard</Description>
@@ -34,6 +34,7 @@
     <PackageReference Include="itext7.pdfhtml" Version="6.1.0" />
     <PackageReference Include="Markdig" Version="0.33.0" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="3.0.1" />
+    <PackageReference Include="NAudio.Lame" Version="2.1.0" />
     <PackageReference Include="NPOI" Version="2.6.2" />
     <PackageReference Include="ClosedXML" Version="0.104.0" />
     <!-- Image processing packages -->
@@ -41,6 +42,7 @@
     <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="13.4.0" />
     <!-- Audio/Video conversion packages -->
     <PackageReference Include="NAudio" Version="2.2.1" />
+    <PackageReference Include="Spire.PDF" Version="11.3.0" />
     <PackageReference Include="Xabe.FFmpeg" Version="5.2.6" />
     <!-- Compression packages -->
     <PackageReference Include="SharpZipLib" Version="1.4.2" />

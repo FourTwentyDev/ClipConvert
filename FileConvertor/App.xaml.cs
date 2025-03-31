@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows;
@@ -69,6 +69,15 @@ namespace FileConvertor
                 factory.RegisterConverterType(typeof(CsvToExcelConverter));
                 factory.RegisterConverterType(typeof(PdfToTextConverter));
                 factory.RegisterConverterType(typeof(Mp3ToWavConverter));
+                factory.RegisterConverterType(typeof(WebpToJpgConverter));
+                factory.RegisterConverterType(typeof(PngToBmpConverter));
+                factory.RegisterConverterType(typeof(BmpToPngConverter));
+                factory.RegisterConverterType(typeof(PdfToWordConverter));
+                factory.RegisterConverterType(typeof(JsonToXmlConverter));
+                factory.RegisterConverterType(typeof(XmlToJsonConverter));
+                factory.RegisterConverterType(typeof(Mp4ToMp3Converter));
+                factory.RegisterConverterType(typeof(M4aToMp3Converter));
+                factory.RegisterConverterType(typeof(HeicToJpgConverter));
                 
                 Logger.Log(LogLevel.Info, "App", "Registered converter types for lazy loading");
                 return factory;

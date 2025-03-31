@@ -30,15 +30,20 @@ Unlike cloud-based converters:
 ### Documents
 - PDF ↔ Text
 - Word ↔ PDF
+- PDF ↔ Word
 - Markdown ↔ HTML
 - Excel ↔ CSV
+- JSON ↔ XML
 
 ### Images
 - JPG ↔ PNG
+- PNG ↔ BMP
+- WebP → JPG
 - More formats in development...
 
-### Audio
+### Audio/Video
 - MP3 ↔ WAV
+- MP4 → MP3
 - More formats in development...
 
 ## 📦 Installation

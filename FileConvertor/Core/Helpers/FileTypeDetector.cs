@@ -61,6 +61,15 @@ namespace FileConvertor.Core.Helpers
                 { ".tif", "tiff" },
                 { ".webp", "webp" },
                 { ".svg", "svg" },
+                
+                // Audio/Video formats
+                { ".mp3", "mp3" },
+                { ".wav", "wav" },
+                { ".mp4", "mp4" },
+                { ".m4a", "m4a" },
+                
+                // Additional image formats
+                { ".heic", "heic" },
             };
         }
 

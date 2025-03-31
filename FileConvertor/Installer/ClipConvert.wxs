@@ -4,7 +4,7 @@
     <Product Id="*" 
              Name="ClipConvert" 
              Language="1033" 
-             Version="1.0.0.0" 
+             Version="1.0.1.0" 
              Manufacturer="FourTwentyDev" 
              UpgradeCode="4a2a8a19-6c7d-4d1f-9b5e-3ed9e1f2c8b0">
         
@@ -647,6 +647,45 @@
                       KeyPath="yes" />
             </Component>
             
+            <!-- iText PDFUA -->
+            <Component Id="ItextPdfuaDLL" Guid="*">
+                <File Id="ItextPdfuaDLLFile" 
+                      Name="itext.pdfua.dll" 
+                      Source="$(var.BinDir)\itext.pdfua.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- NAudio Lame -->
+            <Component Id="NAudioLameDLL" Guid="*">
+                <File Id="NAudioLameDLLFile" 
+                      Name="NAudio.Lame.dll" 
+                      Source="$(var.BinDir)\NAudio.Lame.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- MP3 Lame Libraries -->
+            <Component Id="LibMp3Lame32DLL" Guid="*">
+                <File Id="LibMp3Lame32DLLFile" 
+                      Name="libmp3lame.32.dll" 
+                      Source="$(var.BinDir)\libmp3lame.32.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <Component Id="LibMp3Lame64DLL" Guid="*">
+                <File Id="LibMp3Lame64DLLFile" 
+                      Name="libmp3lame.64.dll" 
+                      Source="$(var.BinDir)\libmp3lame.64.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
+            <!-- Spire PDF -->
+            <Component Id="SpirePdfDLL" Guid="*">
+                <File Id="SpirePdfDLLFile" 
+                      Name="Spire.Pdf.dll" 
+                      Source="$(var.BinDir)\Spire.Pdf.dll" 
+                      KeyPath="yes" />
+            </Component>
+            
         </DirectoryRef>
         
         <!-- Define German localization resources -->
@@ -841,6 +880,13 @@
             <ComponentRef Id="PdfPigPackageDLL" />
             <ComponentRef Id="PdfPigTokenizationDLL" />
             <ComponentRef Id="PdfPigTokensDLL" />
+            
+            <!-- New DLLs for additional converters -->
+            <ComponentRef Id="ItextPdfuaDLL" />
+            <ComponentRef Id="NAudioLameDLL" />
+            <ComponentRef Id="LibMp3Lame32DLL" />
+            <ComponentRef Id="LibMp3Lame64DLL" />
+            <ComponentRef Id="SpirePdfDLL" />
             
             <!-- Localization Resources -->
             <ComponentRef Id="PdfSharpChartingResourcesDLL" />

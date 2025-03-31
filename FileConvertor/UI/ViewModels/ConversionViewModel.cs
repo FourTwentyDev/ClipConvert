@@ -340,15 +340,36 @@ namespace FileConvertor.UI.ViewModels
             if (SelectedFile == null || string.IsNullOrEmpty(SelectedFile.FileFormat))
                 return;
 
+            // Log the file format for debugging
+            Logger.Log(LogLevel.Debug, "ConversionViewModel", $"Updating available target formats for file format: {SelectedFile.FileFormat}");
+            
+            // Get all supported source formats for debugging
+            var allSourceFormats = _fileTypeDetector.GetSupportedSourceFormats();
+            Logger.Log(LogLevel.Debug, "ConversionViewModel", $"All supported source formats: {string.Join(", ", allSourceFormats)}");
+            
+            // Check if the file format is in the supported source formats
+            if (!allSourceFormats.Contains(SelectedFile.FileFormat, StringComparer.OrdinalIgnoreCase))
+            {
+                Logger.Log(LogLevel.Warning, "ConversionViewModel", $"File format '{SelectedFile.FileFormat}' is not in the list of supported source formats");
+            }
+
             var targetFormats = _fileTypeDetector.GetSupportedTargetFormats(SelectedFile.FileFormat);
+            Logger.Log(LogLevel.Debug, "ConversionViewModel", $"Target formats for {SelectedFile.FileFormat}: {string.Join(", ", targetFormats)}");
+            
             foreach (var format in targetFormats)
             {
                 AvailableTargetFormats.Add(format);
+                Logger.Log(LogLevel.Debug, "ConversionViewModel", $"Added target format: {format}");
             }
 
             if (AvailableTargetFormats.Count > 0)
             {
                 SelectedTargetFormat = AvailableTargetFormats[0];
+                Logger.Log(LogLevel.Debug, "ConversionViewModel", $"Selected target format: {SelectedTargetFormat}");
+            }
+            else
+            {
+                Logger.Log(LogLevel.Warning, "ConversionViewModel", $"No target formats available for {SelectedFile.FileFormat}");
             }
         }
 

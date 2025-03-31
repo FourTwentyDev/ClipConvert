@@ -28,18 +28,23 @@ Unlike most conversion tools available today, ClipConvert processes everything l
 ClipConvert supports a wide range of file formats with more being added regularly:
 
 #### Document Formats
-- **PDF Conversion**: Convert to and from PDF format
+- **PDF Conversion**: Convert to and from PDF format, including PDF to Word
 - **Office Documents**: Support for Word, Excel, and other office formats
 - **Markdown/HTML**: Convert between web and documentation formats
 - **Text Processing**: Extract text from various document types
+- **Data Formats**: Convert between JSON and XML for data interchange
 
 #### Image Formats
-- **Raster Images**: Convert between JPG, PNG, and other common formats
+- **Raster Images**: Convert between JPG, PNG, BMP, and other common formats
+- **Web Formats**: Support for WebP to JPG conversion for web optimization
+- **Apple Formats**: Convert HEIC images to JPG for better compatibility
 - **Format Optimization**: Optimize images during conversion for size or quality
 - **Metadata Handling**: Option to preserve or strip metadata during conversion
 
-#### Audio Formats
-- **Audio Conversion**: Support for common audio formats like MP3 and WAV
+#### Audio/Video Formats
+- **Audio Conversion**: Support for common audio formats like MP3, WAV, and M4A
+- **Video Audio Extraction**: Extract audio tracks from video files (MP4 to MP3)
+- **Apple Audio**: Convert M4A audio files to MP3 for wider compatibility
 - **Quality Settings**: Options for bitrate and quality during audio conversion
 
 ## Technical Features
